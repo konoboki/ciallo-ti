@@ -1,162 +1,221 @@
 /**
- * Quiz - 人格测试页面
- * Design: 纯白背景 + Yuzusoft 品牌色，简洁卡片式答题
+ * Quiz - 5级量表测试页面
+ * 24道题，每题1-5分
  */
-import { useState, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
-import { questions, calculateMbti } from "@/lib/questions";
-import { ArrowLeft } from "lucide-react";
+import { questions, calculateMbti, SCALE_LABELS } from "@/lib/questions";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const YUZU_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663549831965/R6aBUjAfbK59aXLEgoJeSD/yuzu-logo_9e5b46df.png";
+const SCALE_OPTIONS = [1, 2, 3, 4, 5] as const;
+
+const DIM_LABEL: Record<string, string> = {
+  E: "外向 / 内向", I: "外向 / 内向",
+  S: "实感 / 直觉", N: "实感 / 直觉",
+  T: "思考 / 情感", F: "思考 / 情感",
+  J: "判断 / 感知", P: "判断 / 感知",
+};
+const DIM_COLOR: Record<string, string> = {
+  E: "#FF8C42", I: "#FF8C42",
+  S: "#4CAF82", N: "#4CAF82",
+  T: "#5B8CFF", F: "#5B8CFF",
+  J: "#C85BFF", P: "#C85BFF",
+};
 
 export default function Quiz() {
   const [, navigate] = useLocation();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [showOptions, setShowOptions] = useState(true);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [idx, setIdx] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [dir, setDir] = useState<1 | -1>(1);
 
-  const currentQuestion = questions[currentIndex];
-  const progress = ((currentIndex) / questions.length) * 100;
+  const q = questions[idx];
+  const progress = (idx / questions.length) * 100;
+  const answered = Object.keys(answers).length;
+  const cur = answers[q.id];
+  const isLast = idx === questions.length - 1;
+  const allDone = answered === questions.length;
 
-  const handleAnswer = useCallback((dimension: string) => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setShowOptions(false);
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const n = parseInt(e.key);
+      if (n >= 1 && n <= 5) pick(n);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [idx, answers]);
 
-    const newAnswers = { ...answers, [currentQuestion.id]: dimension };
-    setAnswers(newAnswers);
-
-    if (currentIndex < questions.length - 1) {
-      setTimeout(() => {
-        setCurrentIndex((prev) => prev + 1);
-        setShowOptions(true);
-        setIsTransitioning(false);
-      }, 350);
-    } else {
-      const mbti = calculateMbti(newAnswers);
-      setTimeout(() => {
-        navigate(`/result?mbti=${mbti}`);
-      }, 500);
+  function pick(score: number) {
+    const next = { ...answers, [q.id]: score };
+    setAnswers(next);
+    if (idx < questions.length - 1) {
+      setTimeout(() => { setDir(1); setIdx(i => i + 1); }, 280);
     }
-  }, [currentIndex, answers, currentQuestion, isTransitioning, navigate]);
+  }
 
-  const handleBack = useCallback(() => {
-    if (currentIndex > 0 && !isTransitioning) {
-      setShowOptions(false);
-      const newAnswers = { ...answers };
-      delete newAnswers[questions[currentIndex - 1].id];
-      setAnswers(newAnswers);
-      setTimeout(() => {
-        setCurrentIndex((prev) => prev - 1);
-        setShowOptions(true);
-      }, 200);
-    }
-  }, [currentIndex, isTransitioning, answers]);
+  function goBack() {
+    if (idx > 0) { setDir(-1); setIdx(i => i - 1); }
+  }
+
+  function submit() {
+    const result = calculateMbti(answers);
+    sessionStorage.setItem("mbtiResult", JSON.stringify(result));
+    navigate("/result");
+  }
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Subtle dot pattern */}
-      <div className="absolute inset-0 dot-pattern opacity-30" />
-
-      {/* Decorative blobs */}
-      <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-yuzu/6 blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-yuzu-leaf/5 blur-3xl" />
-
-      {/* Top bar */}
-      <div className="relative z-10 px-4 pt-4 pb-2">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-4 mb-4">
-            <button
-              onClick={() => currentIndex > 0 ? handleBack() : navigate("/")}
-              className="p-2 rounded-lg text-foreground/40 hover:text-foreground hover:bg-muted transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <img src={YUZU_LOGO} alt="Yuzusoft" className="h-6 object-contain opacity-60" />
-            <div className="flex-1" />
-            <span className="text-sm text-foreground/30 font-medium" style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}>
-              {currentIndex + 1} / {questions.length}
-            </span>
-          </div>
-
-          {/* Progress bar */}
-          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-yuzu to-yuzu-dark"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            />
-          </div>
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* 顶部进度条 */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+        <div className="h-0.5 bg-gray-100">
+          <motion.div
+            className="h-full"
+            style={{ background: "linear-gradient(90deg, #FF8C42, #FF6B1A)" }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          />
+        </div>
+        <div className="px-4 py-3 flex items-center justify-between max-w-2xl mx-auto">
+          <button onClick={() => idx > 0 ? goBack() : navigate("/")}
+            className="flex items-center gap-1 text-sm text-gray-400 hover:text-orange-500 transition-colors">
+            <ChevronLeft size={16} />
+            <img src={YUZU_LOGO} alt="ciallo_ti" className="h-5 object-contain opacity-50" />
+          </button>
+          <span className="text-sm text-gray-400">
+            <span className="font-bold text-gray-700">{idx + 1}</span> / {questions.length}
+          </span>
         </div>
       </div>
 
-      {/* Question area */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-100px)] px-4 pb-8">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentQuestion.id}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.3 }}
-            className="w-full max-w-2xl"
-          >
-            {/* Scenario */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="text-center mb-6 text-foreground/30 text-sm italic"
+      {/* 主体 */}
+      <div className="flex-1 pt-20 pb-28 px-4 flex flex-col items-center justify-center">
+        <div className="w-full max-w-xl mx-auto">
+
+          {/* 维度标签 */}
+          <div className="flex justify-center mb-5">
+            <span className="text-xs font-semibold px-3 py-1 rounded-full"
+              style={{
+                background: `${DIM_COLOR[q.dimension]}15`,
+                color: DIM_COLOR[q.dimension],
+                border: `1px solid ${DIM_COLOR[q.dimension]}30`,
+              }}>
+              {DIM_LABEL[q.dimension]}
+            </span>
+          </div>
+
+          {/* 题目 */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={q.id}
+              initial={{ opacity: 0, x: dir * 32 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: dir * -32 }}
+              transition={{ duration: 0.28, ease: "easeInOut" }}
             >
-              {currentQuestion.scenario}
-            </motion.p>
-
-            {/* Question card */}
-            <div className="yuzu-card px-6 md:px-8 py-6 mb-6 !shadow-none border border-border">
-              <div className="mb-3">
-                <span
-                  className="yuzu-badge"
-                  style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
-                >
-                  Q{currentQuestion.id}
-                </span>
+              {/* 题号 */}
+              <div className="text-center mb-8">
+                <div className="text-[5rem] font-black leading-none select-none mb-3"
+                  style={{ color: "#f3f4f6", fontFamily: "'Noto Serif SC', serif" }}>
+                  {String(q.id).padStart(2, "0")}
+                </div>
+                <h2 className="text-xl md:text-2xl font-semibold text-gray-800 leading-relaxed -mt-8 relative z-10"
+                  style={{ fontFamily: "'Noto Serif SC', serif" }}>
+                  {q.text}
+                </h2>
               </div>
-              <p className="text-foreground/80 leading-relaxed text-lg font-medium" style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}>
-                {currentQuestion.question}
-              </p>
-            </div>
 
-            {/* Options */}
-            <div className="space-y-3">
-              {currentQuestion.options.map((option, idx) => (
-                <motion.button
-                  key={idx}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: showOptions ? 1 : 0, y: showOptions ? 0 : 15 }}
-                  transition={{ duration: 0.3, delay: idx * 0.1 }}
-                  onClick={() => handleAnswer(option.dimension)}
-                  disabled={!showOptions || isTransitioning}
-                  className="w-full text-left px-6 py-4 rounded-xl bg-white border border-border hover:border-yuzu-dark/40 hover:bg-yuzu-light/30 transition-all duration-300 group disabled:opacity-50 shadow-sm hover:shadow-md"
-                >
-                  <div className="flex items-start gap-3">
-                    <span
-                      className="shrink-0 w-7 h-7 rounded-full border-2 border-yuzu/40 flex items-center justify-center text-yuzu-dark text-sm font-bold group-hover:bg-yuzu/10 group-hover:border-yuzu-dark/60 transition-colors mt-0.5"
-                      style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
-                    >
-                      {idx === 0 ? "A" : "B"}
-                    </span>
-                    <span className="text-foreground/70 group-hover:text-foreground transition-colors leading-relaxed">
-                      {option.text}
-                    </span>
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+              {/* 量表 */}
+              <div>
+                <div className="flex justify-between text-xs text-gray-300 px-2 mb-3">
+                  <span>非常不同意</span>
+                  <span>非常同意</span>
+                </div>
+                <div className="flex gap-2 justify-center items-end">
+                  {SCALE_OPTIONS.map((score) => {
+                    const selected = cur === score;
+                    // 尺寸随分值渐增
+                    const size = [52, 58, 64, 70, 78][score - 1];
+                    return (
+                      <motion.button
+                        key={score}
+                        onClick={() => pick(score)}
+                        whileHover={{ scale: 1.1, y: -2 }}
+                        whileTap={{ scale: 0.93 }}
+                        className="rounded-2xl flex flex-col items-center justify-center font-bold text-lg transition-all duration-200 relative focus:outline-none"
+                        style={{
+                          width: size, height: size,
+                          background: selected
+                            ? "linear-gradient(135deg, #FF8C42, #FF6B1A)"
+                            : "#f9fafb",
+                          color: selected ? "#fff" : "#9ca3af",
+                          border: selected ? "none" : "1px solid #e5e7eb",
+                          boxShadow: selected ? "0 6px 20px rgba(255,140,66,0.35)" : "none",
+                        }}
+                        title={SCALE_LABELS[score]}
+                      >
+                        {score}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+                <div className="text-center h-7 mt-3">
+                  <AnimatePresence mode="wait">
+                    {cur && (
+                      <motion.span key={cur}
+                        initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                        className="text-sm font-medium" style={{ color: "#FF8C42" }}>
+                        {SCALE_LABELS[cur]}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* 底部导航 */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 px-4 py-4">
+        <div className="max-w-xl mx-auto flex items-center justify-between gap-4">
+          <button onClick={goBack} disabled={idx === 0}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400
+              hover:text-gray-600 hover:bg-gray-50 disabled:opacity-25 disabled:cursor-not-allowed transition-all">
+            <ChevronLeft size={15} /> 上一题
+          </button>
+
+          <div className="text-xs text-gray-400 text-center">
+            已回答 <span className="font-bold" style={{ color: "#FF8C42" }}>{answered}</span> / {questions.length}
+          </div>
+
+          {isLast ? (
+            <motion.button onClick={submit} disabled={!allDone}
+              whileHover={allDone ? { scale: 1.04 } : {}}
+              whileTap={allDone ? { scale: 0.96 } : {}}
+              className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-bold text-white
+                disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              style={allDone ? {
+                background: "linear-gradient(135deg, #FF8C42, #FF6B1A)",
+                boxShadow: "0 4px 16px rgba(255,140,66,0.4)",
+              } : { background: "#d1d5db" }}>
+              查看结果 <ChevronRight size={15} />
+            </motion.button>
+          ) : (
+            <button onClick={() => { setDir(1); setIdx(i => i + 1); }}
+              disabled={!cur}
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-medium
+                disabled:opacity-25 disabled:cursor-not-allowed transition-all border"
+              style={{ color: "#FF8C42", borderColor: "#FFD5B0" }}>
+              下一题 <ChevronRight size={15} />
+            </button>
+          )}
+        </div>
+        {isLast && !allDone && (
+          <p className="text-center text-xs text-gray-400 mt-2">
+            还有 {questions.length - answered} 道题未回答，请返回补充
+          </p>
+        )}
       </div>
     </div>
   );

@@ -62,18 +62,18 @@ export default function Home() {
 
                 <h1
                   className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground leading-tight mb-4"
-                  style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
+                  style={{ fontFamily: "'Noto Serif SC', serif" }}
                 >
-                  你是柚子社的
+                  你最适合和
                   <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-yuzu to-yuzu-dark">
-                    哪位角色？
+                    哪位柚子社角色结婚？
                   </span>
                 </h1>
 
                 <p className="text-foreground/50 text-lg leading-relaxed max-w-md mx-auto lg:mx-0 mb-8">
-                  通过 16 道精心设计的情境题目，发现你的 MBTI 人格类型，
-                  找到与你最相似的柚子社 Galgame 角色。
+                  通过 24 道 5 级量表题目，测出你的 MBTI 人格类型，
+                  找到最适合与你结婚的柚子社 Galgame 角色。
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
@@ -124,8 +124,8 @@ export default function Home() {
             className="mt-20 grid grid-cols-3 gap-6 max-w-2xl mx-auto"
           >
             {[
-              { number: "16", label: "MBTI 类型" },
-              { number: "16", label: "柚子社角色" },
+              { number: "24", label: "测试题目" },
+              { number: "13", label: "柚子社角色" },
               { number: "7", label: "经典作品" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
@@ -162,7 +162,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="relative z-10 px-6 py-6 border-t border-border">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-foreground/30">
-          <span>YuzuTI - 柚子社人格测试 (非官方粉丝作品)</span>
+          <span>ciallo_ti · 柚子社人格测试 (非官方粉丝作品)</span>
           <span>角色及作品版权归 YUZUSOFT 所有</span>
         </div>
       </footer>

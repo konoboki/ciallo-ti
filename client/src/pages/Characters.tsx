@@ -1,11 +1,11 @@
 /**
  * Characters - 角色图鉴页面
- * Design: 纯白背景 + 角色代表色渐变卡片，无需外部图片
+ * 只保留匹配表中的角色，无详情描述
  */
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
-import { characters, getGameList, mbtiDescriptions } from "@/lib/characters";
+import { characters, getGameList } from "@/lib/characters";
 import { ArrowLeft, Gamepad2, X } from "lucide-react";
 
 const YUZU_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663549831965/R6aBUjAfbK59aXLEgoJeSD/yuzu-logo_9e5b46df.png";
@@ -23,56 +23,48 @@ export default function Characters() {
   const activeChar = characters.find((c) => c.id === selectedChar);
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Subtle dot pattern */}
-      <div className="absolute inset-0 dot-pattern opacity-30" />
-
-      {/* Decorative blobs */}
-      <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-yuzu/6 blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-yuzu-leaf/5 blur-3xl" />
-
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="relative z-10 px-4 pt-4 pb-2">
-        <div className="max-w-6xl mx-auto flex items-center gap-4">
+      <div className="px-4 pt-4 pb-2 border-b border-gray-50">
+        <div className="max-w-6xl mx-auto flex items-center gap-3">
           <button
             onClick={() => navigate("/")}
-            className="p-2 rounded-lg text-foreground/40 hover:text-foreground hover:bg-muted transition-colors"
+            className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <ArrowLeft size={20} />
           </button>
-          <img src={YUZU_LOGO} alt="Yuzusoft" className="h-6 object-contain opacity-60" />
-          <h1
-            className="text-xl font-bold text-foreground/80"
-            style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
-          >
+          <img src={YUZU_LOGO} alt="ciallo_ti" className="h-6 object-contain opacity-50" />
+          <h1 className="text-lg font-bold text-gray-700" style={{ fontFamily: "'Noto Serif SC', serif" }}>
             角色图鉴
           </h1>
         </div>
       </div>
 
       {/* Game filter */}
-      <div className="relative z-10 px-4 py-3">
+      <div className="px-4 py-3 border-b border-gray-50">
         <div className="max-w-6xl mx-auto flex flex-wrap gap-2">
           <button
             onClick={() => setSelectedGame("all")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
               selectedGame === "all"
-                ? "bg-yuzu/15 text-yuzu-dark border border-yuzu/30"
-                : "bg-white border border-border text-foreground/50 hover:text-foreground hover:border-foreground/20"
+                ? "text-white"
+                : "bg-white border border-gray-200 text-gray-500 hover:border-orange-200 hover:text-orange-500"
             }`}
+            style={selectedGame === "all" ? { background: "linear-gradient(135deg, #FF8C42, #FF6B1A)" } : {}}
           >
-            <Gamepad2 size={14} className="inline mr-1.5 -mt-0.5" />
-            全部作品
+            <Gamepad2 size={13} className="inline mr-1.5 -mt-0.5" />
+            全部
           </button>
           {games.map((game) => (
             <button
               key={game}
               onClick={() => setSelectedGame(game)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 selectedGame === game
-                  ? "bg-yuzu/15 text-yuzu-dark border border-yuzu/30"
-                  : "bg-white border border-border text-foreground/50 hover:text-foreground hover:border-foreground/20"
+                  ? "text-white"
+                  : "bg-white border border-gray-200 text-gray-500 hover:border-orange-200 hover:text-orange-500"
               }`}
+              style={selectedGame === game ? { background: "linear-gradient(135deg, #FF8C42, #FF6B1A)" } : {}}
             >
               {game}
             </button>
@@ -81,48 +73,42 @@ export default function Characters() {
       </div>
 
       {/* Character grid */}
-      <div className="relative z-10 px-4 py-4 pb-12">
+      <div className="px-4 py-6 pb-12">
         <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           <AnimatePresence mode="popLayout">
-            {filtered.map((char, idx) => (
+            {filtered.map((char, i) => (
               <motion.div
                 key={char.id}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3, delay: idx * 0.04 }}
+                transition={{ duration: 0.25, delay: i * 0.04 }}
                 onClick={() => setSelectedChar(char.id)}
-                className="group cursor-pointer"
+                className="cursor-pointer group"
               >
-                <div className="yuzu-card overflow-hidden !rounded-xl">
-                  {/* Color gradient header with character initial */}
+                <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  {/* 色块 */}
                   <div
-                    className="relative aspect-[4/3] overflow-hidden flex items-center justify-center"
-                    style={{
-                      background: `linear-gradient(135deg, ${char.color}, ${char.color}88, white)`,
-                    }}
+                    className="aspect-[4/3] flex items-center justify-center relative"
+                    style={{ background: `linear-gradient(135deg, ${char.color}cc, ${char.color}44)` }}
                   >
                     <span
-                      className="text-5xl font-black text-white/60 select-none"
-                      style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
+                      className="text-5xl font-black select-none"
+                      style={{ color: "rgba(50,50,50,0.3)", fontFamily: "'Noto Serif SC', serif" }}
                     >
-                      {char.nameJa.charAt(0)}
+                      {char.name.charAt(0)}
                     </span>
-                    {/* MBTI badge */}
-                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-xs font-bold bg-white/80 backdrop-blur-sm text-foreground/70 border border-white/50">
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-xs font-bold bg-white/80 text-gray-600">
                       {char.mbti}
                     </div>
                   </div>
-                  {/* Info */}
-                  <div className="p-3">
-                    <h3
-                      className="text-foreground font-bold text-sm truncate"
-                      style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
-                    >
+                  {/* 信息 */}
+                  <div className="p-3 bg-white">
+                    <h3 className="font-bold text-sm text-gray-800 truncate" style={{ fontFamily: "'Noto Serif SC', serif" }}>
                       {char.name}
                     </h3>
-                    <p className="text-foreground/35 text-xs mt-0.5 truncate">{char.game}</p>
+                    <p className="text-xs text-gray-400 mt-0.5 truncate">{char.game}</p>
                   </div>
                 </div>
               </motion.div>
@@ -131,7 +117,7 @@ export default function Characters() {
         </div>
       </div>
 
-      {/* Character detail modal */}
+      {/* 角色详情弹窗 */}
       <AnimatePresence>
         {activeChar && (
           <motion.div
@@ -141,76 +127,54 @@ export default function Characters() {
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={() => setSelectedChar(null)}
           >
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-black/25 backdrop-blur-sm" />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-lg bg-white rounded-2xl overflow-hidden shadow-2xl"
+              className="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl"
             >
-              {/* Color header */}
+              {/* 色块头部 */}
               <div
-                className="h-24 relative flex items-center justify-center"
-                style={{
-                  background: `linear-gradient(135deg, ${activeChar.color}, ${activeChar.color}88, white)`,
-                }}
+                className="h-32 flex flex-col items-center justify-center relative"
+                style={{ background: `linear-gradient(135deg, ${activeChar.color}cc, ${activeChar.color}44)` }}
               >
                 <span
-                  className="text-7xl font-black text-white/50 select-none"
-                  style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
+                  className="text-6xl font-black select-none"
+                  style={{ color: "rgba(50,50,50,0.25)", fontFamily: "'Noto Serif SC', serif" }}
                 >
-                  {activeChar.nameJa.charAt(0)}
+                  {activeChar.name.charAt(0)}
                 </span>
                 <button
                   onClick={() => setSelectedChar(null)}
-                  className="absolute top-3 right-3 p-1.5 rounded-full bg-white/60 hover:bg-white/80 text-foreground/50 hover:text-foreground transition-colors"
+                  className="absolute top-3 right-3 p-1.5 rounded-full bg-white/60 hover:bg-white text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  <X size={16} />
+                  <X size={15} />
                 </button>
               </div>
 
-              {/* Info */}
+              {/* 信息 */}
               <div className="p-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <h2
-                    className="text-xl font-bold text-foreground"
-                    style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
+                <div className="flex items-start justify-between mb-1">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-800" style={{ fontFamily: "'Noto Serif SC', serif" }}>
+                      {activeChar.name}
+                    </h2>
+                    <p className="text-sm text-gray-400">{activeChar.nameJa}</p>
+                  </div>
+                  <span
+                    className="text-lg font-black px-3 py-1 rounded-xl"
+                    style={{
+                      background: `${activeChar.color}44`,
+                      color: "#FF6B1A",
+                    }}
                   >
-                    {activeChar.name}
-                  </h2>
-                  <span className="yuzu-badge !text-xs">{activeChar.mbti}</span>
+                    {activeChar.mbti}
+                  </span>
                 </div>
-                <p className="text-foreground/35 text-sm mb-1">{activeChar.nameJa}</p>
-                <p className="text-yuzu-dark/70 text-xs mb-4">{activeChar.game}</p>
-
-                <p
-                  className="text-yuzu-dark font-medium text-sm mb-3 italic"
-                  style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
-                >
-                  「{activeChar.tagline}」
-                </p>
-
-                <p className="text-foreground/60 text-sm leading-relaxed mb-4">
-                  {activeChar.description}
-                </p>
-
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {activeChar.traits.map((trait) => (
-                    <span key={trait} className="px-2.5 py-1 rounded-full text-xs bg-muted text-foreground/50 border border-border">
-                      {trait}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="text-xs text-foreground/30 bg-muted rounded-lg p-3">
-                  <span className="text-yuzu-dark font-medium">{activeChar.mbti}</span>
-                  {" · "}
-                  {mbtiDescriptions[activeChar.mbti]?.title}
-                  {" — "}
-                  {mbtiDescriptions[activeChar.mbti]?.description}
-                </div>
+                <p className="text-sm text-gray-400 mt-3">{activeChar.game}</p>
               </div>
             </motion.div>
           </motion.div>

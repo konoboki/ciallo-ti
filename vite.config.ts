@@ -152,7 +152,10 @@ function vitePluginManusDebugCollector(): Plugin {
 
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
 
+const isGhPages = process.env.GITHUB_PAGES === "true";
+
 export default defineConfig({
+  base: isGhPages ? "/ciallo-ti/" : "/",
   plugins,
   resolve: {
     alias: {

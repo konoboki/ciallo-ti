@@ -15,15 +15,14 @@ const YUZU_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663549831965/R6aB
 interface DimBarProps {
   leftLabel: string;
   rightLabel: string;
-  leftRatio: number;
+  leftPct: number;
   leftWins: boolean;
   tied: boolean;
   color: string;
   delay?: number;
 }
 
-function DimBar({ leftLabel, rightLabel, leftRatio, leftWins, tied, color, delay = 0 }: DimBarProps) {
-  const leftPct = Math.round(leftRatio * 100);
+function DimBar({ leftLabel, rightLabel, leftPct, leftWins, tied, color, delay = 0 }: DimBarProps) {
   const rightPct = 100 - leftPct;
   return (
     <div className="mb-5">
@@ -71,15 +70,15 @@ export default function Result() {
   if (!result) return null;
 
   const char = getMatchedCharacter(result.mbti);
-  const { dims } = result;
+  const { ratios, balanced } = result;
 
-  const hasTied = dims.EI.tied || dims.SN.tied || dims.TF.tied || dims.JP.tied;
   const tiedDims = [
-    dims.EI.tied && "E/I",
-    dims.SN.tied && "S/N",
-    dims.TF.tied && "T/F",
-    dims.JP.tied && "J/P",
+    balanced.EI && "E/I",
+    balanced.SN && "S/N",
+    balanced.TF && "T/F",
+    balanced.JP && "J/P",
   ].filter(Boolean).join("、");
+  const hasTied = tiedDims.length > 0;
 
   function handleShare() {
     const text = `我的MBTI是 ${result!.mbti}，最适合和柚子社的「${char.name}」结婚！快来测测你的结果吧～`;
@@ -145,10 +144,7 @@ export default function Result() {
           >
             <div
               className="text-4xl font-black mb-1"
-              style={{
-                fontFamily: "'Noto Serif SC', serif",
-                color: "rgba(50,50,50,0.75)",
-              }}
+              style={{ fontFamily: "'Noto Serif SC', serif", color: "rgba(50,50,50,0.75)" }}
             >
               {char.name}
             </div>
@@ -181,34 +177,34 @@ export default function Result() {
         >
           <h4 className="text-xs font-bold text-gray-400 mb-5 tracking-widest uppercase">维度分析</h4>
           <DimBar
-            leftLabel="外向 E" rightLabel="内向 I"
-            leftRatio={dims.EI.eRatio}
-            leftWins={dims.EI.winner === "E"}
-            tied={dims.EI.tied}
+            leftLabel="外向" rightLabel="内向"
+            leftPct={ratios.E}
+            leftWins={result.mbti[0] === "E"}
+            tied={balanced.EI}
             color="#FF8C42"
             delay={0.3}
           />
           <DimBar
-            leftLabel="实感 S" rightLabel="直觉 N"
-            leftRatio={dims.SN.sRatio}
-            leftWins={dims.SN.winner === "S"}
-            tied={dims.SN.tied}
+            leftLabel="实感" rightLabel="直觉"
+            leftPct={ratios.S}
+            leftWins={result.mbti[1] === "S"}
+            tied={balanced.SN}
             color="#4CAF82"
             delay={0.45}
           />
           <DimBar
-            leftLabel="思考 T" rightLabel="情感 F"
-            leftRatio={dims.TF.tRatio}
-            leftWins={dims.TF.winner === "T"}
-            tied={dims.TF.tied}
+            leftLabel="思考" rightLabel="情感"
+            leftPct={ratios.T}
+            leftWins={result.mbti[2] === "T"}
+            tied={balanced.TF}
             color="#5B8CFF"
             delay={0.6}
           />
           <DimBar
-            leftLabel="判断 J" rightLabel="感知 P"
-            leftRatio={dims.JP.jRatio}
-            leftWins={dims.JP.winner === "J"}
-            tied={dims.JP.tied}
+            leftLabel="判断" rightLabel="感知"
+            leftPct={ratios.J}
+            leftWins={result.mbti[3] === "J"}
+            tied={balanced.JP}
             color="#C85BFF"
             delay={0.75}
           />
@@ -249,7 +245,6 @@ export default function Result() {
           </button>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-xs text-gray-300 mt-10">
           ciallo_ti · 非官方粉丝作品 · 角色及作品版权归 YUZUSOFT 所有
         </p>

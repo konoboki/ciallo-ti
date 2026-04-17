@@ -19,12 +19,12 @@ export const characters: Character[] = [
   { id: "ayase",    name: "三司绫濑", nameJa: "三司 綾瀬",  game: "RIDDLE JOKER",         mbti: "INFP", color: "#C5D5E8" },
   { id: "nene",     name: "绫地宁宁", nameJa: "綾地 寧々",  game: "魔女的夜宴",           mbti: "INFJ", color: "#E8C5D5" },
   { id: "amane",    name: "谷风天音", nameJa: "谷風 天音",  game: "天使☆嚣嚣 RE-BOOT!",  mbti: "ENTP", color: "#FFE8D5" },
-  { id: "kanade",   name: "仮屋和奏", nameJa: "仮屋 和奏",  game: "AMAIRO ISLENAUTS",     mbti: "ESFP", color: "#FFF0C5" },
+  { id: "kanade",   name: "仮屋和奏", nameJa: "仮屋 和奏",  game: "魔女的夜宴",           mbti: "ESFP", color: "#FFF0C5" },
   { id: "nanami",   name: "在原七海", nameJa: "在原 七海",  game: "RIDDLE JOKER",         mbti: "ISFJ", color: "#E8E5C5" },
-  { id: "suzuno",   name: "汐山凉音", nameJa: "汐山 涼音",  game: "Hoshi Ori Yume Mirai", mbti: "ISTJ", color: "#C5D8E8" },
+  { id: "suzuno",   name: "汐山凉音", nameJa: "汐山 涼音",  game: "星光咖啡馆与死神之蝶", mbti: "ISTJ", color: "#C5D8E8" },
   { id: "rikka",    name: "马庭芦花", nameJa: "馬庭 芦花",  game: "DRACU-RIOT!",          mbti: "ESFJ", color: "#E8C5D8" },
   { id: "yoshino",  name: "朝武芳乃", nameJa: "朝武 芳乃",  game: "千恋＊万花",           mbti: "ISFJ", color: "#E8D5F5" },
-  { id: "sumi",     name: "墨染希",  nameJa: "墨染 希",    game: "天使☆嚣嚣 RE-BOOT!",  mbti: "ESFJ", color: "#D5C5E8" },
+  { id: "sumi",     name: "墨染希",  nameJa: "墨染 希",    game: "星光咖啡馆与死神之蝶", mbti: "ESFJ", color: "#D5C5E8" },
   { id: "mako",     name: "常陆茉子", nameJa: "常陸 茉子",  game: "千恋＊万花",           mbti: "ISFJ", color: "#C5E8D5" },
 ];
 

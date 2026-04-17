@@ -32,13 +32,13 @@ export const characters: Character[] = [
  * 用户MBTI → 最适合结婚的角色
  */
 export const mbtiToCharacter: Record<string, string> = {
-  INFP:  "ayase",
+  INFP:  "kanna",
   ENFP:  "natsume",
-  INFJ:  "meguru",
+  INFJ:  "amane",
   ENFJ:  "ayase",
   INTP:  "kanna",
   ENTP:  "nene",
-  INTJ:  "amane",
+  INTJ:  "meguru",
   ENTJ:  "ayase",
   ISFJ:  "kanade",
   ESFJ:  "nanami",

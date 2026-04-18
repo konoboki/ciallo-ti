@@ -72,7 +72,7 @@ export default function Home() {
                 </h1>
 
                 <p className="text-foreground/50 text-lg leading-relaxed max-w-md mx-auto lg:mx-0 mb-8">
-                  通过 24 道 5 级量表题目，测出你最适合与你结婚的柚子社女主。
+                  通过 24 道 galgame 情景测试，测出最适合与你结婚的柚子社女主。
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">

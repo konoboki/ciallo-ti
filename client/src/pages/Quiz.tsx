@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { questions, calculateMbti, type Answer, type Choice } from "@/lib/questions";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const YUZU_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663549831965/R6aBUjAfbK59aXLEgoJeSD/yuzu-logo_9e5b46df.png";
+const YUZU_LOGO = `${import.meta.env.BASE_URL}cialloti-logo.jpg`;
 
 export default function Quiz() {
   const [, navigate] = useLocation();

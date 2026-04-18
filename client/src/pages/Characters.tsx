@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { characters, getGameList } from "@/lib/characters";
 import { ArrowLeft, Gamepad2, X } from "lucide-react";
 
-const YUZU_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663549831965/R6aBUjAfbK59aXLEgoJeSD/yuzu-logo_9e5b46df.png";
+const YUZU_LOGO = `${import.meta.env.BASE_URL}cialloti-logo.jpg`;
 
 export default function Characters() {
   const [, navigate] = useLocation();

@@ -10,7 +10,7 @@ import type { MbtiResult } from "@/lib/questions";
 import { RotateCcw, Share2, Users } from "lucide-react";
 import { toast } from "sonner";
 
-const YUZU_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663549831965/R6aBUjAfbK59aXLEgoJeSD/yuzu-logo_9e5b46df.png";
+const YUZU_LOGO = `${import.meta.env.BASE_URL}cialloti-logo.jpg`;
 
 interface DimBarProps {
   leftLabel: string;

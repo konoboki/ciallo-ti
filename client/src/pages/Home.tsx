@@ -57,7 +57,7 @@ export default function Home() {
               >
                 <div className="inline-flex items-center gap-2 yuzu-badge mb-6">
                   <Sparkles size={14} />
-                  <span>MBTI 人格测试</span>
+                  <span>Ciallo-ti</span>
                 </div>
 
                 <h1
@@ -72,8 +72,7 @@ export default function Home() {
                 </h1>
 
                 <p className="text-foreground/50 text-lg leading-relaxed max-w-md mx-auto lg:mx-0 mb-8">
-                  通过 24 道 5 级量表题目，测出你的 MBTI 人格类型，
-                  找到最适合与你结婚的柚子社 Galgame 角色。
+                  通过 24 道 5 级量表题目，测出你最适合与你结婚的柚子社女主。
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">

@@ -115,46 +115,7 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* Stats section */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-20 grid grid-cols-3 gap-6 max-w-2xl mx-auto"
-          >
-            {[
-              { number: "24", label: "测试题目" },
-              { number: "13", label: "柚子社角色" },
-              { number: "7", label: "经典作品" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div
-                  className="text-3xl md:text-4xl font-black text-yuzu-dark"
-                  style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}
-                >
-                  {stat.number}
-                </div>
-                <div className="text-sm text-foreground/40 mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
 
-          {/* Game list preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-16 text-center"
-          >
-            <p className="text-sm text-foreground/30 mb-4">涵盖作品</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {["千恋＊万花", "魔女的夜宴", "RIDDLE JOKER", "星光咖啡馆与死神之蝶", "天使☆嚣嚣 RE-BOOT!", "DRACU-RIOT!", "天神乱漫"].map((game) => (
-                <span key={game} className="yuzu-badge !text-xs">
-                  {game}
-                </span>
-              ))}
-            </div>
-          </motion.div>
         </div>
       </main>
 

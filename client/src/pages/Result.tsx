@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
-import { getMatchedCharacter } from "@/lib/characters";
+import { getMatchedCharacter, getMatchDescription } from "@/lib/characters";
 import type { MbtiResult } from "@/lib/questions";
 import { RotateCcw, Share2, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -70,6 +70,7 @@ export default function Result() {
   if (!result) return null;
 
   const char = getMatchedCharacter(result.mbti);
+  const matchDesc = getMatchDescription(result.mbti);
   const { ratios, balanced } = result;
 
   const tiedDims = [
@@ -130,6 +131,20 @@ export default function Result() {
             </motion.p>
           )}
         </motion.div>
+
+        {/* 配对描述 */}
+        {matchDesc && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-8 px-5 py-5 rounded-2xl"
+            style={{ background: "linear-gradient(135deg, #FFF8F0, #FFF3E8)", border: "1px solid #FFE0C5" }}
+          >
+            <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#FF8C42" }}>为什么是 Ta？</p>
+            <p className="text-sm leading-relaxed text-gray-600" style={{ fontFamily: "'Noto Serif SC', serif" }}>{matchDesc}</p>
+          </motion.div>
+        )}
 
         {/* 匹配角色卡 */}
         <motion.div

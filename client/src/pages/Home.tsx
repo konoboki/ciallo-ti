@@ -124,7 +124,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-foreground/40 mb-4">
             <span>ciallo_ti · 柚子社人格测试 (非官方粉丝作品)</span>
-            <span>受到 <a href="https://acgti.tianxingleo.top" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/60 transition-colors">ACGTI</a> 和 <a href="https://www.16personalities.com" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/60 transition-colors">SBTI</a> 启发</span>
+            <span>受到 <a href="https://acgti.tianxingleo.top" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/60 transition-colors">ACGTI</a> 和 <a href="https://www.bilibili.com/video/BV1LpDHByET6/?spm_id_from=333.337.search-card.all.click" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/60 transition-colors">SBTI</a> 启发</span>
           </div>
           <div className="text-xs text-foreground/30 text-center">
             <p>角色及作品版权归 YUZUSOFT 所有 | 本网站为非官方粉丝作品，仅供娱乐使用</p>

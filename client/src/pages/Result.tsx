@@ -1,6 +1,6 @@
 /**
  * Result - 测试结果页面
- * 显示MBTI类型、维度百分比、匹配角色
+ * 布局顺序：立绘卡（放大）→ 角色信息 → 配对描述 → 测试者MBTI → 维度分析
  */
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -101,70 +101,30 @@ export default function Result() {
 
       <div className="max-w-xl mx-auto px-4 pb-16">
 
-        {/* MBTI 类型 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mt-8 mb-8"
-        >
-          <p className="text-xs text-gray-400 tracking-widest uppercase mb-3">Your Personality Type</p>
-          <div
-            className="text-7xl font-black tracking-widest mb-3"
-            style={{
-              fontFamily: "'Noto Serif SC', serif",
-              background: "linear-gradient(135deg, #FF8C42, #FF6B1A)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            {result.mbti}
-          </div>
-          {hasTied && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-xs text-orange-400"
-            >
-              {tiedDims} 维度接近平衡，已取略偏方向
-            </motion.p>
-          )}
-        </motion.div>
-
-        {/* 配对描述 */}
-        {matchDesc && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mb-8 px-5 py-5 rounded-2xl"
-            style={{ background: "linear-gradient(135deg, #FFF8F0, #FFF3E8)", border: "1px solid #FFE0C5" }}
-          >
-            <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#FF8C42" }}>为什么是 Ta？</p>
-            <p className="text-sm leading-relaxed text-gray-600" style={{ fontFamily: "'Noto Serif SC', serif" }}>{matchDesc}</p>
-          </motion.div>
-        )}
-
-        {/* 匹配角色卡 */}
+        {/* ① 立绘卡（放大，角色名同屏可见） */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-          className="rounded-3xl overflow-hidden mb-8 border border-gray-100 shadow-sm"
+          transition={{ duration: 0.5 }}
+          className="rounded-3xl overflow-hidden mt-6 border border-gray-100 shadow-sm"
         >
+          {/* 图片区域：有立绘时撑高显示完整图，无立绘时保持色块 */}
           <div
-            className="h-56 flex flex-col items-center justify-center relative overflow-hidden"
-            style={{ background: `linear-gradient(135deg, ${char.color}cc, ${char.color}44)` }}
+            className="relative overflow-hidden flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${char.color}cc, ${char.color}44)`,
+              minHeight: char.image ? "0" : "14rem",
+            }}
           >
             {char.image ? (
               <img
                 src={char.image}
                 alt={char.name}
-                className="absolute inset-0 w-full h-full object-cover object-top"
+                className="w-full block"
+                style={{ maxHeight: "72vw", objectFit: "contain", objectPosition: "center top" }}
               />
             ) : (
-              <>
+              <div className="py-14 flex flex-col items-center">
                 <div
                   className="text-4xl font-black mb-1"
                   style={{ fontFamily: "'Noto Serif SC', serif", color: "rgba(50,50,50,0.75)" }}
@@ -172,9 +132,11 @@ export default function Result() {
                   {char.name}
                 </div>
                 <div className="text-sm" style={{ color: "rgba(50,50,50,0.45)" }}>{char.nameJa}</div>
-              </>
+              </div>
             )}
           </div>
+
+          {/* 角色信息 */}
           <div className="px-6 py-5 bg-white flex items-start justify-between">
             <div>
               <p className="text-xs text-gray-400 mb-1">最适合结婚的角色</p>
@@ -193,12 +155,57 @@ export default function Result() {
           </div>
         </motion.div>
 
-        {/* 维度分析 */}
+        {/* ② 配对描述 */}
+        {matchDesc && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="mt-5 px-5 py-5 rounded-2xl"
+            style={{ background: "linear-gradient(135deg, #FFF8F0, #FFF3E8)", border: "1px solid #FFE0C5" }}
+          >
+            <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#FF8C42" }}>为什么是 Ta？</p>
+            <p className="text-sm leading-relaxed text-gray-600" style={{ fontFamily: "'Noto Serif SC', serif" }}>{matchDesc}</p>
+          </motion.div>
+        )}
+
+        {/* ③ 测试者 MBTI 类型 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="text-center mt-8 mb-2"
+        >
+          <p className="text-xs text-gray-400 tracking-widest uppercase mb-3">Your Personality Type</p>
+          <div
+            className="text-7xl font-black tracking-widest mb-3"
+            style={{
+              fontFamily: "'Noto Serif SC', serif",
+              background: "linear-gradient(135deg, #FF8C42, #FF6B1A)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            {result.mbti}
+          </div>
+          {hasTied && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-xs text-orange-400"
+            >
+              {tiedDims} 维度接近平衡，已取略偏方向
+            </motion.p>
+          )}
+        </motion.div>
+
+        {/* ④ 维度分析 */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="bg-gray-50 rounded-2xl px-6 py-6 mb-8"
+          transition={{ duration: 0.5, delay: 0.35 }}
+          className="bg-gray-50 rounded-2xl px-6 py-6 mb-8 mt-4"
         >
           <h4 className="text-xs font-bold text-gray-400 mb-5 tracking-widest uppercase">维度分析</h4>
           <DimBar
@@ -207,7 +214,7 @@ export default function Result() {
             leftWins={result.mbti[0] === "E"}
             tied={balanced.EI}
             color="#FF8C42"
-            delay={0.3}
+            delay={0.35}
           />
           <DimBar
             leftLabel="实感" rightLabel="直觉"
@@ -215,7 +222,7 @@ export default function Result() {
             leftWins={result.mbti[1] === "S"}
             tied={balanced.SN}
             color="#4CAF82"
-            delay={0.45}
+            delay={0.5}
           />
           <DimBar
             leftLabel="思考" rightLabel="情感"
@@ -223,7 +230,7 @@ export default function Result() {
             leftWins={result.mbti[2] === "T"}
             tied={balanced.TF}
             color="#5B8CFF"
-            delay={0.6}
+            delay={0.65}
           />
           <DimBar
             leftLabel="判断" rightLabel="感知"
@@ -231,7 +238,7 @@ export default function Result() {
             leftWins={result.mbti[3] === "J"}
             tied={balanced.JP}
             color="#C85BFF"
-            delay={0.75}
+            delay={0.8}
           />
         </motion.div>
 
@@ -239,7 +246,7 @@ export default function Result() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.7 }}
           className="flex gap-3"
         >
           <button

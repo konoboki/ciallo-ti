@@ -147,47 +147,24 @@ export default function Preview() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.35 }}
             >
-              {/* MBTI 大字 */}
-              <div className="text-center mb-6">
-                <p className="text-xs text-gray-400 tracking-widest uppercase mb-2">Your Personality Type</p>
+              {/* ① 角色卡（立绘在最上方，图片完整显示） */}
+              <div className="rounded-3xl overflow-hidden mb-5 border border-gray-100 shadow-sm">
                 <div
-                  className="text-7xl font-black tracking-widest"
+                  className="relative overflow-hidden flex items-center justify-center"
                   style={{
-                    fontFamily: "'Noto Serif SC', serif",
-                    background: "linear-gradient(135deg, #FF8C42, #FF6B1A)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
+                    background: `linear-gradient(135deg, ${char.color}cc, ${char.color}44)`,
+                    minHeight: char.image ? "0" : "14rem",
                   }}
-                >
-                  {selected}
-                </div>
-              </div>
-
-              {/* 配对描述 */}
-              {matchDesc && (
-                <div
-                  className="mb-6 px-5 py-5 rounded-2xl"
-                  style={{ background: "linear-gradient(135deg, #FFF8F0, #FFF3E8)", border: "1px solid #FFE0C5" }}
-                >
-                  <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#FF8C42" }}>为什么是 Ta？</p>
-                  <p className="text-sm leading-relaxed text-gray-600" style={{ fontFamily: "'Noto Serif SC', serif" }}>{matchDesc}</p>
-                </div>
-              )}
-
-              {/* 角色卡 */}
-              <div className="rounded-3xl overflow-hidden mb-6 border border-gray-100 shadow-sm">
-                <div
-                  className="h-56 flex flex-col items-center justify-center relative overflow-hidden"
-                  style={{ background: `linear-gradient(135deg, ${char.color}cc, ${char.color}44)` }}
                 >
                   {char.image ? (
                     <img
                       src={char.image}
                       alt={char.name}
-                      className="absolute inset-0 w-full h-full object-cover object-top"
+                      className="w-full block"
+                      style={{ maxHeight: "72vw", objectFit: "contain", objectPosition: "center top" }}
                     />
                   ) : (
-                    <>
+                    <div className="py-14 flex flex-col items-center">
                       <div
                         className="text-4xl font-black mb-1"
                         style={{ fontFamily: "'Noto Serif SC', serif", color: "rgba(50,50,50,0.75)" }}
@@ -195,7 +172,7 @@ export default function Preview() {
                         {char.name}
                       </div>
                       <div className="text-sm" style={{ color: "rgba(50,50,50,0.45)" }}>{char.nameJa}</div>
-                    </>
+                    </div>
                   )}
                 </div>
                 <div className="px-6 py-5 bg-white flex items-start justify-between">
@@ -213,8 +190,35 @@ export default function Preview() {
                 </div>
               </div>
 
-              {/* 维度分析 */}
-              <div className="bg-gray-50 rounded-2xl px-6 py-6 mb-6">
+              {/* ② 配对描述 */}
+              {matchDesc && (
+                <div
+                  className="mb-5 px-5 py-5 rounded-2xl"
+                  style={{ background: "linear-gradient(135deg, #FFF8F0, #FFF3E8)", border: "1px solid #FFE0C5" }}
+                >
+                  <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#FF8C42" }}>为什么是 Ta？</p>
+                  <p className="text-sm leading-relaxed text-gray-600" style={{ fontFamily: "'Noto Serif SC', serif" }}>{matchDesc}</p>
+                </div>
+              )}
+
+              {/* ③ 测试者 MBTI 大字 */}
+              <div className="text-center mt-6 mb-2">
+                <p className="text-xs text-gray-400 tracking-widest uppercase mb-2">Your Personality Type</p>
+                <div
+                  className="text-7xl font-black tracking-widest"
+                  style={{
+                    fontFamily: "'Noto Serif SC', serif",
+                    background: "linear-gradient(135deg, #FF8C42, #FF6B1A)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  {selected}
+                </div>
+              </div>
+
+              {/* ④ 维度分析 */}
+              <div className="bg-gray-50 rounded-2xl px-6 py-6 mb-6 mt-4">
                 <h4 className="text-xs font-bold text-gray-400 mb-5 tracking-widest uppercase">维度分析</h4>
                 <DimBar leftLabel="外向" rightLabel="内向" leftPct={ratios.E} leftWins={selected[0]==="E"} color="#FF8C42" delay={0.1} />
                 <DimBar leftLabel="实感" rightLabel="直觉" leftPct={ratios.S} leftWins={selected[1]==="S"} color="#4CAF82" delay={0.2} />

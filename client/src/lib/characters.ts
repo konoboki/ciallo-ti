@@ -11,6 +11,7 @@ export interface Character {
   mbti: string;
   color: string;
   description?: string;
+  image?: string;
 }
 
 export const characters: Character[] = [
@@ -111,6 +112,7 @@ export const characters: Character[] = [
     game: "千恋＊万花",
     mbti: "ISFJ",
     color: "#E8D5F5",
+    image: "/manus-storage/yoshino_98b98dd8.png",
     description: 'ESFP 容易喜欢那种"看起来规矩温顺，但其实很认真、很能扛、感情又很真"的人。芳乃一方面很有责任心，会一直练舞、一直坚持巫女职责，另一方面又会因为被认可而害羞、会想把喜悦传递给对方、会在感情上笨拙又真诚。对你来说，这种人很甜，因为你越靠近，越能看到她认真外表下面很柔软的心。',
   },
   {

@@ -88,17 +88,25 @@ export default function Characters() {
                 className="cursor-pointer group"
               >
                 <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                  {/* 色块 */}
+                  {/* 色块 / 立绘 */}
                   <div
-                    className="aspect-[4/3] flex items-center justify-center relative"
+                    className="aspect-[4/3] flex items-center justify-center relative overflow-hidden"
                     style={{ background: `linear-gradient(135deg, ${char.color}cc, ${char.color}44)` }}
                   >
-                    <span
-                      className="text-5xl font-black select-none"
-                      style={{ color: "rgba(50,50,50,0.3)", fontFamily: "'Noto Serif SC', serif" }}
-                    >
-                      {char.name.charAt(0)}
-                    </span>
+                    {char.image ? (
+                      <img
+                        src={char.image}
+                        alt={char.name}
+                        className="absolute inset-0 w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                      <span
+                        className="text-5xl font-black select-none"
+                        style={{ color: "rgba(50,50,50,0.3)", fontFamily: "'Noto Serif SC', serif" }}
+                      >
+                        {char.name.charAt(0)}
+                      </span>
+                    )}
                     <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-xs font-bold bg-white/80 text-gray-600">
                       {char.mbti}
                     </div>
@@ -136,17 +144,25 @@ export default function Characters() {
               onClick={(e) => e.stopPropagation()}
               className="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl"
             >
-              {/* 色块头部 */}
+              {/* 立绘 / 色块头部 */}
               <div
-                className="h-32 flex flex-col items-center justify-center relative"
+                className="h-48 flex flex-col items-center justify-center relative overflow-hidden"
                 style={{ background: `linear-gradient(135deg, ${activeChar.color}cc, ${activeChar.color}44)` }}
               >
-                <span
-                  className="text-6xl font-black select-none"
-                  style={{ color: "rgba(50,50,50,0.25)", fontFamily: "'Noto Serif SC', serif" }}
-                >
-                  {activeChar.name.charAt(0)}
-                </span>
+                {activeChar.image ? (
+                  <img
+                    src={activeChar.image}
+                    alt={activeChar.name}
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <span
+                    className="text-6xl font-black select-none"
+                    style={{ color: "rgba(50,50,50,0.25)", fontFamily: "'Noto Serif SC', serif" }}
+                  >
+                    {activeChar.name.charAt(0)}
+                  </span>
+                )}
                 <button
                   onClick={() => setSelectedChar(null)}
                   className="absolute top-3 right-3 p-1.5 rounded-full bg-white/60 hover:bg-white text-gray-500 hover:text-gray-700 transition-colors"

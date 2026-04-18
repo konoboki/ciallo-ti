@@ -154,16 +154,26 @@ export default function Result() {
           className="rounded-3xl overflow-hidden mb-8 border border-gray-100 shadow-sm"
         >
           <div
-            className="h-40 flex flex-col items-center justify-center"
+            className="h-56 flex flex-col items-center justify-center relative overflow-hidden"
             style={{ background: `linear-gradient(135deg, ${char.color}cc, ${char.color}44)` }}
           >
-            <div
-              className="text-4xl font-black mb-1"
-              style={{ fontFamily: "'Noto Serif SC', serif", color: "rgba(50,50,50,0.75)" }}
-            >
-              {char.name}
-            </div>
-            <div className="text-sm" style={{ color: "rgba(50,50,50,0.45)" }}>{char.nameJa}</div>
+            {char.image ? (
+              <img
+                src={char.image}
+                alt={char.name}
+                className="absolute inset-0 w-full h-full object-cover object-top"
+              />
+            ) : (
+              <>
+                <div
+                  className="text-4xl font-black mb-1"
+                  style={{ fontFamily: "'Noto Serif SC', serif", color: "rgba(50,50,50,0.75)" }}
+                >
+                  {char.name}
+                </div>
+                <div className="text-sm" style={{ color: "rgba(50,50,50,0.45)" }}>{char.nameJa}</div>
+              </>
+            )}
           </div>
           <div className="px-6 py-5 bg-white flex items-start justify-between">
             <div>

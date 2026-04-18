@@ -100,7 +100,7 @@ export const characters: Character[] = [
     id: "rikka",
     name: "马庭芦花",
     nameJa: "馬庭 芦花",
-    game: "DRACU-RIOT!",
+    game: "千恋＊万花",
     mbti: "ESFJ",
     color: "#E8C5D8",
     description: 'ISFP 往往容易被会主动表达关心、把人拉进关系里的人吸引。马庭芦花的气质很强：照顾店面、照顾客人、撮合互动、会开玩笑也会反击，整个人很像会把一个场子撑起来的大姐头。对你来说，这种外放的温暖特别有安全感，因为她会替你把很多你不想说破的关系需求直接做出来。',

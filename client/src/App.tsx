@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Quiz from "./pages/Quiz";
 import Characters from "./pages/Characters";
 import Result from "./pages/Result";
+import Preview from "./pages/Preview";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               <Route path="/quiz" component={Quiz} />
               <Route path="/characters" component={Characters} />
               <Route path="/result" component={Result} />
+              <Route path="/preview" component={Preview} />
               <Route path="/404" component={NotFound} />
               <Route component={NotFound} />
             </Switch>

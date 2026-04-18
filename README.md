@@ -37,8 +37,8 @@ ciallo_ti 是一个基于 MBTI 人格类型的柚子社（YUZUSOFT）Galgame 角
 每个维度各自累计分数后进行比较：
 
 ```
-E 总分 = Q1(A) + Q2(A) + Q3(A) + Q4(A) + Q5(A) + Q6(A) 中选 A 的数量
-I 总分 = Q1(B) + Q2(B) + Q3(B) + Q4(B) + Q5(B) + Q6(B) 中选 B 的数量
+E 总分 = Q1~Q6 中选 A 的数量
+I 总分 = Q1~Q6 中选 B 的数量
 
 如果 E > I → 判 E；如果 I > E → 判 I
 ```
@@ -67,22 +67,22 @@ I 总分 = Q1(B) + Q2(B) + Q3(B) + Q4(B) + Q5(B) + Q6(B) 中选 B 的数量
 
 | 你的 MBTI | 匹配角色 | 角色 MBTI | 所属作品 |
 |-----------|---------|-----------|---------|
-| INFP | 明月栞那 | ENFJ | RIDDLE JOKER |
-| ENFP | 四季夏目 | INTJ | RIDDLE JOKER |
+| INFP | 明月栞那 | ENFJ | 星光咖啡馆与死神之蝶 |
+| INTP | 明月栞那 | ENFJ | 星光咖啡馆与死神之蝶 |
+| ENFP | 四季夏目 | INTJ | 星光咖啡馆与死神之蝶 |
+| INTJ | 因幡巡 | ENFP | 魔女的夜宴 |
+| ENTP | 绫地宁宁 | INFJ | 魔女的夜宴 |
 | INFJ | 谷风天音 | ENTP | 天使☆嚣嚣 RE-BOOT! |
 | ENFJ | 三司绫濑 | INFP | RIDDLE JOKER |
-| INTP | 明月栞那 | ENFJ | RIDDLE JOKER |
-| ENTP | 绫地宁宁 | INFJ | 千恋万花 |
-| INTJ | 因幡巡 | ENFP | RIDDLE JOKER |
 | ENTJ | 三司绫濑 | INFP | RIDDLE JOKER |
 | ISFJ | 仮屋和奏 | ESFP | 魔女的夜宴 |
-| ESFJ | 在原七海 | ISFJ | 千恋万花 |
 | ISTJ | 仮屋和奏 | ESFP | 魔女的夜宴 |
+| ESFJ | 在原七海 | ISFJ | RIDDLE JOKER |
 | ESTJ | 汐山凉音 | ISTJ | 星光咖啡馆与死神之蝶 |
-| ISFP | 马庭芦花 | ESFJ | 千恋万花 |
-| ESFP | 朝武芳乃 | ISFJ | 千恋万花 |
+| ISFP | 马庭芦花 | ESFJ | DRACU-RIOT! |
+| ESFP | 朝武芳乃 | ISFJ | 千恋＊万花 |
 | ISTP | 墨染希 | ESFJ | 星光咖啡馆与死神之蝶 |
-| ESTP | 常陆茉子 | ISFJ | 千恋万花 |
+| ESTP | 常陆茉子 | ISFJ | 千恋＊万花 |
 
 ---
 
@@ -112,6 +112,26 @@ GITHUB_PAGES=true pnpm build
 
 ---
 
+## 版权与致谢
+
+### 版权声明
+
+本项目为非官方粉丝作品，仅供娱乐使用，不用于任何商业目的。
+
+- 所有游戏角色、剧情、美术资产的版权归 **株式会社 YUZUSOFT** 所有
+- 角色信息参考自 [萌娘百科](https://zh.moegirl.org.cn/) 及 [YUZUSOFT 官方网站](https://www.yuzu-soft.com/)
+
+### 致谢
+
+本项目的设计与创意受到以下作品的启发：
+
+- **[ACGTI](https://acgti.tianxingleo.top)** — 二次元角色人格测试网站，提供了设计参考
+- **[SBTI](https://www.bilibili.com/video/BV1LpDHByET6/)** — B 站 SBTI 测试视频，提供了创意灵感
+
+感谢以上创作者的开创性工作。
+
+---
+
 ## 免责声明
 
-本项目为非官方粉丝作品，仅供娱乐。所有角色及作品版权归 **YUZUSOFT** 所有。
+本项目与 YUZUSOFT 官方无任何关联。所有角色名称、游戏标题均为其各自版权持有人的财产。本项目仅为粉丝创作，旨在向柚子社的优秀作品致敬。

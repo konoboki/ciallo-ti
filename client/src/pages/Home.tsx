@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { Sparkles, BookOpen, ArrowRight } from "lucide-react";
 
-const YUZU_LOGO = "/manus-storage/7671325E-14B4-448D-BD1E-11470D242E69_5622af30.png";
+const YUZU_LOGO = "/manus-storage/2e65fcaf4720df2ffaacfe02132b3803_5dc58a90.jpg";
 
 export default function Home() {
   const [, navigate] = useLocation();

@@ -288,7 +288,7 @@ export default function Result() {
           {/* 角色信息 */}
           <div className="px-6 py-5 bg-white flex flex-col items-center justify-center text-center">
             <p className="text-lg font-black mb-3 text-black">
-              最适合结婚的角色 (∠·ω < )⌒★
+              最适合结婚的角色 (∠·ω ·)⌒★
             </p>
             <h3
               className="text-3xl font-black"

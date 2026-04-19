@@ -288,12 +288,12 @@ export default function Result() {
           {/* 角色信息 */}
           <div className="px-6 py-5 bg-white flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold mb-1" style={{ color: "#FF8C42" }}>
+              <p className="text-xs font-semibold mb-1 text-black">
                 最适合结婚的角色
               </p>
               <h3
-                className="text-xl font-bold text-gray-800"
-                style={{ fontFamily: "'Noto Serif SC', serif" }}
+                className="text-xl font-bold"
+                style={{ fontFamily: "'Noto Serif SC', serif", color: "#FF8C42" }}
               >
                 {char.name}
               </h3>

@@ -42,17 +42,24 @@ interface DimBarProps {
   rightLabel: string;
   leftPct: number;
   leftWins: boolean;
+  tied: boolean;
   color: string;
   delay?: number;
 }
 
-function DimBar({ leftLabel, rightLabel, leftPct, leftWins, color, delay = 0 }: DimBarProps) {
+function DimBar({ leftLabel, rightLabel, leftPct, leftWins, tied, color, delay = 0 }: DimBarProps) {
   const rightPct = 100 - leftPct;
   return (
     <div className="mb-5">
       <div className="flex justify-between items-center mb-1.5">
-        <span className={`text-sm font-bold ${leftWins ? "text-gray-800" : "text-gray-400"}`}>{leftLabel}</span>
-        <span className={`text-sm font-bold ${!leftWins ? "text-gray-800" : "text-gray-400"}`}>{rightLabel}</span>
+        <span className={`text-sm font-bold ${leftWins ? "text-gray-800" : "text-gray-400"}`}>
+          {leftLabel}
+          {tied && leftWins && <span className="ml-1 text-xs font-normal text-orange-400">（略偏）</span>}
+        </span>
+        <span className={`text-sm font-bold ${!leftWins ? "text-gray-800" : "text-gray-400"}`}>
+          {rightLabel}
+          {tied && !leftWins && <span className="ml-1 text-xs font-normal text-orange-400">（略偏）</span>}
+        </span>
       </div>
       <div className="h-3 rounded-full bg-gray-100 overflow-hidden relative">
         <motion.div
@@ -78,6 +85,20 @@ export default function Preview() {
   const char = selected ? getMatchedCharacter(selected) : null;
   const matchDesc = selected ? getMatchDescription(selected) : "";
   const ratios = selected ? MOCK_RATIOS[selected] : null;
+  const balanced = selected
+    ? {
+        EI: ratios!.E === 50,
+        SN: ratios!.S === 50,
+        TF: ratios!.T === 50,
+        JP: ratios!.J === 50,
+      }
+    : null;
+  const tiedDims = balanced
+    ? [balanced.EI && "E/I", balanced.SN && "S/N", balanced.TF && "T/F", balanced.JP && "J/P"]
+        .filter(Boolean)
+        .join("、")
+    : "";
+  const hasTied = tiedDims.length > 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -160,8 +181,8 @@ export default function Preview() {
                     <img
                       src={char.image}
                       alt={char.name}
-                      className="w-full block"
-                      style={{ maxHeight: "72vw", objectFit: "contain", objectPosition: "center top" }}
+                      className="block mx-auto"
+                      style={{ width: "66.67%", maxHeight: "48vw", objectFit: "contain", objectPosition: "center top" }}
                     />
                   ) : (
                     <div className="py-14 flex flex-col items-center">
@@ -175,15 +196,18 @@ export default function Preview() {
                     </div>
                   )}
                 </div>
-                <div className="px-6 py-5 bg-white flex items-start justify-between">
-                  <div>
-                    <p className="text-xs text-gray-400 mb-1">最适合结婚的角色</p>
-                    <h3 className="text-xl font-bold text-gray-800" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-                      {char.name}
-                    </h3>
-                    <p className="text-sm text-gray-400 mt-0.5">{char.game}</p>
-                  </div>
-                  <div className="text-right">
+                <div className="px-6 py-5 bg-white flex flex-col items-center justify-center text-center">
+                  <p className="text-lg font-black mb-3 text-black">
+                    最适合结婚的角色 (∠·ω ·)⌒★
+                  </p>
+                  <h3
+                    className="text-3xl font-black"
+                    style={{ fontFamily: "'Noto Serif SC', serif", color: "#FF8C42" }}
+                  >
+                    {char.name}
+                  </h3>
+                  <p className="text-sm text-gray-400 mt-1">{char.game}</p>
+                  <div className="mt-4 text-center">
                     <p className="text-xs text-gray-400 mb-1">角色 MBTI</p>
                     <span className="text-xl font-black" style={{ color: "#FF8C42" }}>{char.mbti}</span>
                   </div>
@@ -205,7 +229,7 @@ export default function Preview() {
               <div className="text-center mt-6 mb-2">
                 <p className="text-xs text-gray-400 tracking-widest uppercase mb-2">Your Personality Type</p>
                 <div
-                  className="text-7xl font-black tracking-widest"
+                  className="text-7xl font-black tracking-widest mb-3"
                   style={{
                     fontFamily: "'Noto Serif SC', serif",
                     background: "linear-gradient(135deg, #FF8C42, #FF6B1A)",
@@ -215,15 +239,52 @@ export default function Preview() {
                 >
                   {selected}
                 </div>
+                {hasTied && (
+                  <p className="text-xs text-orange-400">
+                    {tiedDims} 维度接近平衡，已取略偏方向
+                  </p>
+                )}
               </div>
 
               {/* ④ 维度分析 */}
               <div className="bg-gray-50 rounded-2xl px-6 py-6 mb-6 mt-4">
                 <h4 className="text-xs font-bold text-gray-400 mb-5 tracking-widest uppercase">维度分析</h4>
-                <DimBar leftLabel="外向" rightLabel="内向" leftPct={ratios.E} leftWins={selected[0]==="E"} color="#FF8C42" delay={0.1} />
-                <DimBar leftLabel="实感" rightLabel="直觉" leftPct={ratios.S} leftWins={selected[1]==="S"} color="#4CAF82" delay={0.2} />
-                <DimBar leftLabel="思考" rightLabel="情感" leftPct={ratios.T} leftWins={selected[2]==="T"} color="#5B8CFF" delay={0.3} />
-                <DimBar leftLabel="判断" rightLabel="感知" leftPct={ratios.J} leftWins={selected[3]==="J"} color="#C85BFF" delay={0.4} />
+                <DimBar
+                  leftLabel="外向"
+                  rightLabel="内向"
+                  leftPct={ratios.E}
+                  leftWins={selected[0]==="E"}
+                  tied={balanced?.EI ?? false}
+                  color="#FF8C42"
+                  delay={0.4}
+                />
+                <DimBar
+                  leftLabel="实感"
+                  rightLabel="直觉"
+                  leftPct={ratios.S}
+                  leftWins={selected[1]==="S"}
+                  tied={balanced?.SN ?? false}
+                  color="#4CAF82"
+                  delay={0.55}
+                />
+                <DimBar
+                  leftLabel="思考"
+                  rightLabel="情感"
+                  leftPct={ratios.T}
+                  leftWins={selected[2]==="T"}
+                  tied={balanced?.TF ?? false}
+                  color="#5B8CFF"
+                  delay={0.7}
+                />
+                <DimBar
+                  leftLabel="判断"
+                  rightLabel="感知"
+                  leftPct={ratios.J}
+                  leftWins={selected[3]==="J"}
+                  tied={balanced?.JP ?? false}
+                  color="#C85BFF"
+                  delay={0.85}
+                />
               </div>
 
               {/* 重置按钮 */}

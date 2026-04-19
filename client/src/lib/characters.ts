@@ -60,7 +60,7 @@ export const characters: Character[] = [
     name: "绫地宁宁",
     nameJa: "綾地 寧々",
     game: "魔女的夜宴",
-    mbti: "0d00",
+    mbti: "0721",
     color: "#E8C5D5",
     image: `/characters/ayachi-nene.png`,
     description: 'ENTP 常常最吃"表面安静、其实看人很深"的类型。宁宁的核心魅力就在于她不是普通的温柔，而是那种高敏感、会观察关系边界、能从互动模式直接看出一个人有问题的感觉；再加上她长期背负很多、内里压抑又自我牺牲，会让你很想去试探她、逗她、看她真正松开的样子。简单说，就是太有"深度感"和"可被打开感"了。',

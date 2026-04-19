@@ -10,14 +10,17 @@ const CORS = {
 };
 
 async function initTables(db) {
-  await db.exec(`
+ await db.prepare(`
     CREATE TABLE IF NOT EXISTS character_stats (
       character_id TEXT PRIMARY KEY,
       match_count INTEGER NOT NULL DEFAULT 0,
       rating_count INTEGER NOT NULL DEFAULT 0,
       rating_sum INTEGER NOT NULL DEFAULT 0,
       updated_at INTEGER NOT NULL DEFAULT (unixepoch())
-    );
+      )
+  `).run();
+
+  await db.prepare(`
     CREATE TABLE IF NOT EXISTS character_ratings (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       character_id TEXT NOT NULL,
@@ -25,8 +28,8 @@ async function initTables(db) {
       rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
       created_at INTEGER NOT NULL DEFAULT (unixepoch()),
       UNIQUE(character_id, session_id)
-    );
-  `);
+      )
+  `).run();
 }
 
 export async function onRequestOptions() {

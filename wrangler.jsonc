@@ -6,7 +6,7 @@
     "enabled": true
   },
   "assets": {
-    "directory": "./dist/public",
+    "directory": "./dist",
     "not_found_handling": "single-page-application"
   },
   "compatibility_flags": [
@@ -19,3 +19,4 @@
       "database_id": "6053966c-933e-4670-966f-562b9fef2daa"
     }
   ]
+}

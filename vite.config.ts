@@ -196,10 +196,8 @@ function vitePluginStorageProxy(): Plugin {
   };
 }
 
-const isGhPages = process.env.GITHUB_PAGES === "true";
-
 export default defineConfig({
-  base: isGhPages ? "/ciallo-ti/" : "/",
+  base: "/",
   plugins: [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()],
   resolve: {
     alias: {

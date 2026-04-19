@@ -2,7 +2,7 @@
 
 > 非官方粉丝作品 · 角色及作品版权归 YUZUSOFT 所有
 
-**在线体验：** https://konoboki.github.io/ciallo-ti/
+**在线体验：** ciallomeow.com
 
 ---
 

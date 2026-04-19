@@ -288,19 +288,23 @@ export default function Result() {
           {/* 角色信息 */}
           <div className="px-6 py-5 bg-white flex items-start justify-between">
             <div>
-              <p className="text-xs text-gray-400 mb-1">最适合结婚的角色</p>
-              <h3
-                className="text-3xl font-black"
+              <p
+                className="text-sm font-bold mb-1"
                 style={{
-                  fontFamily: "'Noto Serif SC', serif",
-                  background: `linear-gradient(135deg, ${char.color}, #FF6B1A)`,
+                  background: "linear-gradient(135deg, #FF8C42, #FF6B1A)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
               >
+                最适合结婚的角色
+              </p>
+              <h3
+                className="text-xl font-bold text-gray-800"
+                style={{ fontFamily: "'Noto Serif SC', serif" }}
+              >
                 {char.name}
               </h3>
-              <p className="text-sm text-gray-400 mt-1">{char.game}</p>
+              <p className="text-sm text-gray-400 mt-0.5">{char.game}</p>
             </div>
             <div className="text-right">
               <p className="text-xs text-gray-400 mb-1">角色 MBTI</p>

@@ -1,7 +1,7 @@
 /**
  * Result - 测试结果页面
  * 布局顺序：立绘卡（放大）→ 角色信息 → 评分区域 → 配对描述 → 测试者MBTI → 维度分析
- * 评分/计数使用 tRPC (trpc.character.*)
+ * 评分/计数使用 Cloudflare Pages Functions API (/api/ratings/:characterId)
  */
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,7 +10,6 @@ import { getMatchedCharacter, getMatchDescription } from "@/lib/characters";
 import type { MbtiResult } from "@/lib/questions";
 import { RotateCcw, Share2, Users, Star, Heart } from "lucide-react";
 import { toast } from "sonner";
-import { trpc } from "@/lib/trpc";
 
 const YUZU_LOGO = `/cialloti-logo.jpg`;
 
@@ -22,6 +21,55 @@ function getSessionId(): string {
     localStorage.setItem("cialloti_session", sid);
   }
   return sid;
+}
+
+interface RatingStats {
+  match_count: number;
+  rating_count: number;
+  avg_rating: number;
+}
+
+/** 调用 Pages Functions API 获取角色统计 */
+async function fetchStats(characterId: string): Promise<RatingStats | null> {
+  try {
+    const res = await fetch(`/api/ratings/${encodeURIComponent(characterId)}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** 调用 Pages Functions API 提交匹配记录 */
+async function postMatch(characterId: string): Promise<void> {
+  try {
+    await fetch(`/api/ratings/${encodeURIComponent(characterId)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "match" }),
+    });
+  } catch {
+    // 静默失败
+  }
+}
+
+/** 调用 Pages Functions API 提交评分 */
+async function postRating(
+  characterId: string,
+  sessionId: string,
+  rating: number
+): Promise<{ user_rating: number; rating_count: number; avg_rating: number } | null> {
+  try {
+    const res = await fetch(`/api/ratings/${encodeURIComponent(characterId)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "rate", rating, session_id: sessionId }),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
 interface DimBarProps {
@@ -108,7 +156,11 @@ export default function Result() {
   const [result, setResult] = useState<MbtiResult | null>(null);
   const sessionId = useRef(getSessionId());
   const recordedRef = useRef(false);
+
+  // 评分/统计状态
+  const [stats, setStats] = useState<RatingStats | null>(null);
   const [myRating, setMyRating] = useState<number | null>(null);
+  const [isRating, setIsRating] = useState(false);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("mbtiResult");
@@ -122,40 +174,43 @@ export default function Result() {
 
   const char = result ? getMatchedCharacter(result.mbti) : null;
 
-  // 获取角色统计
-  const { data: statsData, refetch: refetchStats } = trpc.character.getStats.useQuery(
-    { characterId: char?.id ?? "" },
-    { enabled: !!char?.id }
-  );
+  // 加载统计数据
+  useEffect(() => {
+    if (!char?.id) return;
+    fetchStats(char.id).then((data) => {
+      if (data) setStats(data);
+    });
+  }, [char?.id]);
 
-  // 记录匹配次数
-  const recordMatchMutation = trpc.character.recordMatch.useMutation({
-    onSuccess: () => refetchStats(),
-  });
-
+  // 记录匹配次数（只记录一次）
   useEffect(() => {
     if (char?.id && !recordedRef.current) {
       recordedRef.current = true;
-      recordMatchMutation.mutate({ characterId: char.id });
+      postMatch(char.id).then(() => {
+        fetchStats(char.id).then((data) => {
+          if (data) setStats(data);
+        });
+      });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [char?.id]);
 
   // 提交评分
-  const rateMutation = trpc.character.rate.useMutation({
-    onSuccess: (_, vars) => {
-      setMyRating(vars.rating);
-      refetchStats();
+  const handleRate = async (rating: number) => {
+    if (!char?.id || isRating) return;
+    setIsRating(true);
+    const res = await postRating(char.id, sessionId.current, rating);
+    setIsRating(false);
+    if (res) {
+      setMyRating(res.user_rating);
+      setStats((prev) => ({
+        match_count: prev?.match_count ?? 0,
+        rating_count: res.rating_count,
+        avg_rating: res.avg_rating,
+      }));
       toast.success("评分已提交！感谢你的反馈 ♡");
-    },
-    onError: () => {
+    } else {
       toast.error("评分提交失败，请稍后再试");
-    },
-  });
-
-  const handleRate = (rating: number) => {
-    if (!char?.id || rateMutation.isPending) return;
-    rateMutation.mutate({ characterId: char.id, sessionId: sessionId.current, rating });
+    }
   };
 
   if (!result || !char) return null;
@@ -171,9 +226,9 @@ export default function Result() {
   ].filter(Boolean).join("、");
   const hasTied = tiedDims.length > 0;
 
-  const matchCount = statsData?.matchCount ?? 0;
-  const avgRating = statsData && statsData.ratingCount > 0 ? statsData.avgRating : null;
-  const ratingCount = statsData?.ratingCount ?? 0;
+  const matchCount = stats?.match_count ?? 0;
+  const avgRating = stats && stats.rating_count > 0 ? stats.avg_rating : null;
+  const ratingCount = stats?.rating_count ?? 0;
 
   function handleShare() {
     const text = `我的MBTI是 ${result!.mbti}，最适合和柚子社的「${char!.name}」结婚！快来测测你的结果吧～`;
@@ -285,7 +340,7 @@ export default function Result() {
               <StarRating
                 value={myRating}
                 onChange={handleRate}
-                disabled={rateMutation.isPending}
+                disabled={isRating}
               />
               <AnimatePresence>
                 {myRating && (

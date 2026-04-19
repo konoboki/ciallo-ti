@@ -1,16 +1,27 @@
 /**
  * Result - 测试结果页面
- * 布局顺序：立绘卡（放大）→ 角色信息 → 配对描述 → 测试者MBTI → 维度分析
+ * 布局顺序：立绘卡（放大）→ 角色信息 → 评分区域 → 配对描述 → 测试者MBTI → 维度分析
  */
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { getMatchedCharacter, getMatchDescription } from "@/lib/characters";
 import type { MbtiResult } from "@/lib/questions";
-import { RotateCcw, Share2, Users } from "lucide-react";
+import { RotateCcw, Share2, Users, Star, Heart } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
-const YUZU_LOGO = `${import.meta.env.BASE_URL}cialloti-logo.jpg`;
+const YUZU_LOGO = `/cialloti-logo.jpg`;
+
+/** 生成或获取匿名 sessionId */
+function getSessionId(): string {
+  let sid = localStorage.getItem("cialloti_session");
+  if (!sid) {
+    sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem("cialloti_session", sid);
+  }
+  return sid;
+}
 
 interface DimBarProps {
   leftLabel: string;
@@ -53,9 +64,49 @@ function DimBar({ leftLabel, rightLabel, leftPct, leftWins, tied, color, delay =
   );
 }
 
+/** 星级评分组件 */
+function StarRating({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: number | null;
+  onChange: (v: number) => void;
+  disabled?: boolean;
+}) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const display = hovered ?? value ?? 0;
+
+  return (
+    <div className="flex gap-1.5 items-center">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          disabled={disabled}
+          onClick={() => onChange(star)}
+          onMouseEnter={() => !disabled && setHovered(star)}
+          onMouseLeave={() => !disabled && setHovered(null)}
+          className={`transition-all duration-150 ${disabled ? "cursor-default" : "cursor-pointer hover:scale-110"}`}
+          aria-label={`${star}星`}
+        >
+          <Star
+            size={28}
+            className="transition-colors duration-150"
+            fill={star <= display ? "#FF8C42" : "none"}
+            stroke={star <= display ? "#FF8C42" : "#D1D5DB"}
+            strokeWidth={1.5}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function Result() {
   const [, navigate] = useLocation();
   const [result, setResult] = useState<MbtiResult | null>(null);
+  const sessionId = useRef(getSessionId());
+  const recordedRef = useRef(false);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("mbtiResult");
@@ -67,9 +118,52 @@ export default function Result() {
     }
   }, [navigate]);
 
-  if (!result) return null;
+  const char = result ? getMatchedCharacter(result.mbti) : null;
 
-  const char = getMatchedCharacter(result.mbti);
+  // 获取角色统计
+  const { data: stats, refetch: refetchStats } = trpc.character.getStats.useQuery(
+    { characterId: char?.id ?? "" },
+    { enabled: !!char?.id }
+  );
+
+  // 获取当前用户评分
+  const { data: myRatingData, refetch: refetchMyRating } = trpc.character.getMyRating.useQuery(
+    { characterId: char?.id ?? "", sessionId: sessionId.current },
+    { enabled: !!char?.id }
+  );
+
+  // 记录匹配次数（只记录一次）
+  const recordMatch = trpc.character.recordMatch.useMutation();
+  useEffect(() => {
+    if (char?.id && !recordedRef.current) {
+      recordedRef.current = true;
+      recordMatch.mutate({ characterId: char.id });
+    }
+  }, [char?.id]);
+
+  // 提交评分
+  const rateMutation = trpc.character.rate.useMutation({
+    onSuccess: () => {
+      refetchStats();
+      refetchMyRating();
+      toast.success("评分已提交！感谢你的反馈 ♡");
+    },
+    onError: () => {
+      toast.error("评分提交失败，请稍后再试");
+    },
+  });
+
+  const handleRate = (rating: number) => {
+    if (!char?.id) return;
+    rateMutation.mutate({
+      characterId: char.id,
+      sessionId: sessionId.current,
+      rating,
+    });
+  };
+
+  if (!result || !char) return null;
+
   const matchDesc = getMatchDescription(result.mbti);
   const { ratios, balanced } = result;
 
@@ -81,8 +175,13 @@ export default function Result() {
   ].filter(Boolean).join("、");
   const hasTied = tiedDims.length > 0;
 
+  const myRating = myRatingData?.rating ?? null;
+  const matchCount = stats?.matchCount ?? 0;
+  const avgRating = stats?.avgRating ?? null;
+  const ratingCount = stats?.ratingCount ?? 0;
+
   function handleShare() {
-    const text = `我的MBTI是 ${result!.mbti}，最适合和柚子社的「${char.name}」结婚！快来测测你的结果吧～`;
+    const text = `我的MBTI是 ${result!.mbti}，最适合和柚子社的「${char!.name}」结婚！快来测测你的结果吧～`;
     if (navigator.share) {
       navigator.share({ text }).catch(() => {});
     } else if (navigator.clipboard) {
@@ -108,7 +207,7 @@ export default function Result() {
           transition={{ duration: 0.5 }}
           className="rounded-3xl overflow-hidden mt-6 border border-gray-100 shadow-sm"
         >
-          {/* 图片区域：有立绘时撑高显示完整图，无立绘时保持色块 */}
+          {/* 图片区域 */}
           <div
             className="relative overflow-hidden flex items-center justify-center"
             style={{
@@ -155,13 +254,65 @@ export default function Result() {
           </div>
         </motion.div>
 
-        {/* ② 配对描述 */}
+        {/* ② 评分 & 计数区域 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mt-4 rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50 px-5 py-5"
+        >
+          {/* 计数行 */}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-1.5 text-sm text-gray-500">
+              <Heart size={14} className="text-orange-400" fill="#FF8C42" />
+              <span>
+                已有 <span className="font-bold text-orange-500">{matchCount.toLocaleString()}</span> 人
+                与 {char.name} 配对
+              </span>
+            </div>
+            {avgRating !== null && ratingCount > 0 && (
+              <div className="flex items-center gap-1 text-sm text-gray-500 ml-auto">
+                <Star size={13} fill="#FF8C42" stroke="#FF8C42" />
+                <span className="font-bold text-orange-500">{avgRating}</span>
+                <span className="text-gray-400 text-xs">（{ratingCount}人评分）</span>
+              </div>
+            )}
+          </div>
+
+          {/* 评分区域 */}
+          <div>
+            <p className="text-xs text-gray-400 mb-2.5">
+              {myRating ? "你已给出评分，点击可修改" : "你觉得这个配对结果如何？给它打个分吧！"}
+            </p>
+            <div className="flex items-center gap-3">
+              <StarRating
+                value={myRating}
+                onChange={handleRate}
+                disabled={rateMutation.isPending}
+              />
+              <AnimatePresence>
+                {myRating && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="text-sm text-orange-400 font-medium"
+                  >
+                    {["", "不太合适", "还行吧", "挺好的", "非常好！", "完美配对！"][myRating]}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ③ 配对描述 */}
         {matchDesc && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="mt-5 px-5 py-5 rounded-2xl"
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-4 px-5 py-5 rounded-2xl"
             style={{ background: "linear-gradient(135deg, #FFF8F0, #FFF3E8)", border: "1px solid #FFE0C5" }}
           >
             <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#FF8C42" }}>为什么是 Ta？</p>
@@ -169,11 +320,11 @@ export default function Result() {
           </motion.div>
         )}
 
-        {/* ③ 测试者 MBTI 类型 */}
+        {/* ④ 测试者 MBTI 类型 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.25 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
           className="text-center mt-8 mb-2"
         >
           <p className="text-xs text-gray-400 tracking-widest uppercase mb-3">Your Personality Type</p>
@@ -200,11 +351,11 @@ export default function Result() {
           )}
         </motion.div>
 
-        {/* ④ 维度分析 */}
+        {/* ⑤ 维度分析 */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
           className="bg-gray-50 rounded-2xl px-6 py-6 mb-8 mt-4"
         >
           <h4 className="text-xs font-bold text-gray-400 mb-5 tracking-widest uppercase">维度分析</h4>
@@ -214,7 +365,7 @@ export default function Result() {
             leftWins={result.mbti[0] === "E"}
             tied={balanced.EI}
             color="#FF8C42"
-            delay={0.35}
+            delay={0.4}
           />
           <DimBar
             leftLabel="实感" rightLabel="直觉"
@@ -222,7 +373,7 @@ export default function Result() {
             leftWins={result.mbti[1] === "S"}
             tied={balanced.SN}
             color="#4CAF82"
-            delay={0.5}
+            delay={0.55}
           />
           <DimBar
             leftLabel="思考" rightLabel="情感"
@@ -230,7 +381,7 @@ export default function Result() {
             leftWins={result.mbti[2] === "T"}
             tied={balanced.TF}
             color="#5B8CFF"
-            delay={0.65}
+            delay={0.7}
           />
           <DimBar
             leftLabel="判断" rightLabel="感知"
@@ -238,7 +389,7 @@ export default function Result() {
             leftWins={result.mbti[3] === "J"}
             tied={balanced.JP}
             color="#C85BFF"
-            delay={0.8}
+            delay={0.85}
           />
         </motion.div>
 

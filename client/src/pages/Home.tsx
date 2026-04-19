@@ -6,10 +6,14 @@
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { Sparkles, BookOpen, ArrowRight } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
 
-const YUZU_LOGO = `${import.meta.env.BASE_URL}cialloti-logo.jpg`;
+const YUZU_LOGO = `/cialloti-logo.jpg`;
 
 export default function Home() {
+  const { user, loading, isAuthenticated, logout } = useAuth();
+  void user; void loading; void isAuthenticated; void logout;
+
   const [, navigate] = useLocation();
 
   return (

@@ -288,14 +288,7 @@ export default function Result() {
           {/* 角色信息 */}
           <div className="px-6 py-5 bg-white flex items-start justify-between">
             <div>
-              <p
-                className="text-sm font-bold mb-1"
-                style={{
-                  background: "linear-gradient(135deg, #FF8C42, #FF6B1A)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
+              <p className="text-xs font-semibold mb-1" style={{ color: "#FF8C42" }}>
                 最适合结婚的角色
               </p>
               <h3

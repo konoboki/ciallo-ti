@@ -30,7 +30,7 @@ export const characters: Character[] = [
     name: "四季夏目",
     nameJa: "四季 ナツメ",
     game: "星光咖啡馆与死神之蝶",
-    mbti: "枣子姐",
+    mbti: "钝钝钝器",
     color: "#E8C5C5",
     image: `/characters/shiki-natsume.png`,
     description: 'ENFP 很容易被"表面冷、内里认真，而且有自己标准的人"吸过去。四季夏目那种会紧张、会害羞、对自己要求高、在事情上很认真但感情上不轻易外露的气质，正好会让你觉得又神秘又想靠近。你喜欢去撬开别人冷静外壳，夏目这种克制感、反差感、还有一点笨拙可爱的地方，杀伤力就很强。',

@@ -1,15 +1,15 @@
 /**
  * Result - 测试结果页面
  * 布局顺序：立绘卡（放大）→ 角色信息 → 评分区域 → 配对描述 → 测试者MBTI → 维度分析
+ * 评分/计数使用 Cloudflare Pages Functions API (/api/ratings/:characterId)
  */
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { getMatchedCharacter, getMatchDescription } from "@/lib/characters";
 import type { MbtiResult } from "@/lib/questions";
 import { RotateCcw, Share2, Users, Star, Heart } from "lucide-react";
 import { toast } from "sonner";
-import { trpc } from "@/lib/trpc";
 
 const YUZU_LOGO = `/cialloti-logo.jpg`;
 
@@ -21,6 +21,55 @@ function getSessionId(): string {
     localStorage.setItem("cialloti_session", sid);
   }
   return sid;
+}
+
+interface RatingStats {
+  match_count: number;
+  rating_count: number;
+  avg_rating: number;
+}
+
+/** 调用 Pages Functions API 获取角色统计 */
+async function fetchStats(characterId: string): Promise<RatingStats | null> {
+  try {
+    const res = await fetch(`/api/ratings/${encodeURIComponent(characterId)}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** 调用 Pages Functions API 提交匹配记录 */
+async function postMatch(characterId: string): Promise<void> {
+  try {
+    await fetch(`/api/ratings/${encodeURIComponent(characterId)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "match" }),
+    });
+  } catch {
+    // 静默失败
+  }
+}
+
+/** 调用 Pages Functions API 提交评分 */
+async function postRating(
+  characterId: string,
+  sessionId: string,
+  rating: number
+): Promise<{ user_rating: number; rating_count: number; avg_rating: number } | null> {
+  try {
+    const res = await fetch(`/api/ratings/${encodeURIComponent(characterId)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "rate", rating, session_id: sessionId }),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
 interface DimBarProps {
@@ -108,6 +157,11 @@ export default function Result() {
   const sessionId = useRef(getSessionId());
   const recordedRef = useRef(false);
 
+  // 评分/统计状态
+  const [stats, setStats] = useState<RatingStats | null>(null);
+  const [myRating, setMyRating] = useState<number | null>(null);
+  const [isRating, setIsRating] = useState(false);
+
   useEffect(() => {
     const raw = sessionStorage.getItem("mbtiResult");
     if (!raw) { navigate("/"); return; }
@@ -120,46 +174,43 @@ export default function Result() {
 
   const char = result ? getMatchedCharacter(result.mbti) : null;
 
-  // 获取角色统计
-  const { data: stats, refetch: refetchStats } = trpc.character.getStats.useQuery(
-    { characterId: char?.id ?? "" },
-    { enabled: !!char?.id }
-  );
-
-  // 获取当前用户评分
-  const { data: myRatingData, refetch: refetchMyRating } = trpc.character.getMyRating.useQuery(
-    { characterId: char?.id ?? "", sessionId: sessionId.current },
-    { enabled: !!char?.id }
-  );
+  // 加载统计数据
+  const loadStats = useCallback(async () => {
+    if (!char?.id) return;
+    const data = await fetchStats(char.id);
+    if (data) setStats(data);
+  }, [char?.id]);
 
   // 记录匹配次数（只记录一次）
-  const recordMatch = trpc.character.recordMatch.useMutation();
   useEffect(() => {
     if (char?.id && !recordedRef.current) {
       recordedRef.current = true;
-      recordMatch.mutate({ characterId: char.id });
+      postMatch(char.id).then(() => loadStats());
     }
-  }, [char?.id]);
+  }, [char?.id, loadStats]);
+
+  // 初始加载统计
+  useEffect(() => {
+    if (char?.id) loadStats();
+  }, [char?.id, loadStats]);
 
   // 提交评分
-  const rateMutation = trpc.character.rate.useMutation({
-    onSuccess: () => {
-      refetchStats();
-      refetchMyRating();
+  const handleRate = async (rating: number) => {
+    if (!char?.id || isRating) return;
+    setIsRating(true);
+    const res = await postRating(char.id, sessionId.current, rating);
+    setIsRating(false);
+    if (res) {
+      setMyRating(res.user_rating);
+      setStats((prev) => ({
+        match_count: prev?.match_count ?? 0,
+        rating_count: res.rating_count,
+        avg_rating: res.avg_rating,
+      }));
       toast.success("评分已提交！感谢你的反馈 ♡");
-    },
-    onError: () => {
+    } else {
       toast.error("评分提交失败，请稍后再试");
-    },
-  });
-
-  const handleRate = (rating: number) => {
-    if (!char?.id) return;
-    rateMutation.mutate({
-      characterId: char.id,
-      sessionId: sessionId.current,
-      rating,
-    });
+    }
   };
 
   if (!result || !char) return null;
@@ -175,10 +226,9 @@ export default function Result() {
   ].filter(Boolean).join("、");
   const hasTied = tiedDims.length > 0;
 
-  const myRating = myRatingData?.rating ?? null;
-  const matchCount = stats?.matchCount ?? 0;
-  const avgRating = stats?.avgRating ?? null;
-  const ratingCount = stats?.ratingCount ?? 0;
+  const matchCount = stats?.match_count ?? 0;
+  const avgRating = stats && stats.rating_count > 0 ? stats.avg_rating : null;
+  const ratingCount = stats?.rating_count ?? 0;
 
   function handleShare() {
     const text = `我的MBTI是 ${result!.mbti}，最适合和柚子社的「${char!.name}」结婚！快来测测你的结果吧～`;
@@ -240,12 +290,17 @@ export default function Result() {
             <div>
               <p className="text-xs text-gray-400 mb-1">最适合结婚的角色</p>
               <h3
-                className="text-xl font-bold text-gray-800"
-                style={{ fontFamily: "'Noto Serif SC', serif" }}
+                className="text-3xl font-black"
+                style={{
+                  fontFamily: "'Noto Serif SC', serif",
+                  background: `linear-gradient(135deg, ${char.color}, #FF6B1A)`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
               >
                 {char.name}
               </h3>
-              <p className="text-sm text-gray-400 mt-0.5">{char.game}</p>
+              <p className="text-sm text-gray-400 mt-1">{char.game}</p>
             </div>
             <div className="text-right">
               <p className="text-xs text-gray-400 mb-1">角色 MBTI</p>
@@ -288,7 +343,7 @@ export default function Result() {
               <StarRating
                 value={myRating}
                 onChange={handleRate}
-                disabled={rateMutation.isPending}
+                disabled={isRating}
               />
               <AnimatePresence>
                 {myRating && (
@@ -312,7 +367,7 @@ export default function Result() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-4 px-5 py-5 rounded-2xl"
+            className="mt-4 rounded-2xl px-5 py-4"
             style={{ background: "linear-gradient(135deg, #FFF8F0, #FFF3E8)", border: "1px solid #FFE0C5" }}
           >
             <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#FF8C42" }}>为什么是 Ta？</p>

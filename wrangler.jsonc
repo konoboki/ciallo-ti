@@ -11,5 +11,11 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ciallo-ti-ratings",
+      "database_id": "6053966c-933e-4670-966f-562b9fef2daa"
+    }
   ]
-}

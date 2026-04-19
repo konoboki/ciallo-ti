@@ -88,12 +88,16 @@ I 总分 = Q1~Q6 中选 B 的数量
 
 ## 技术栈
 
-- **框架：** React 19 + TypeScript
-- **样式：** Tailwind CSS 4 + shadcn/ui
-- **动画：** Framer Motion
-- **路由：** Wouter（Hash 路由，兼容 GitHub Pages）
-- **构建：** Vite 7
-- **部署：** GitHub Pages（`gh-pages` 分支）
+| 层级 | 技术 |
+|------|------|
+| 前端框架 | React 19 + TypeScript |
+| 样式 | Tailwind CSS 4 + shadcn/ui |
+| 动画 | Framer Motion |
+| 路由 | Wouter |
+| 构建工具 | Vite 7 |
+| 部署平台 | Cloudflare Pages |
+| 后端 API | Cloudflare Pages Functions |
+| 数据库 | Cloudflare D1（SQLite） |
 
 ---
 
@@ -103,12 +107,45 @@ I 总分 = Q1~Q6 中选 B 的数量
 # 安装依赖
 pnpm install
 
-# 启动开发服务器
+# 启动开发服务器（Vite，访问 http://localhost:5173）
 pnpm dev
 
-# 构建（GitHub Pages 模式）
-GITHUB_PAGES=true pnpm build
+# 构建
+pnpm build   # 输出到 dist/public/
+
+# TypeScript 类型检查
+pnpm check
 ```
+
+> 本地开发时 `/api/ratings/*` 接口不可用（需要 Cloudflare D1 环境），评分区域会静默降级显示为 0，不影响其他功能测试。
+
+---
+
+## 部署（Cloudflare Pages）
+
+### 构建配置
+
+| 项目 | 值 |
+|------|----|  
+| 构建命令 | `pnpm build` |
+| 输出目录 | `dist/public` |
+| Node.js 版本 | 22 |
+
+### D1 数据库绑定
+
+在 Cloudflare Pages 项目 → Settings → Bindings 中添加：
+
+| 类型 | Variable name | 数据库 |
+|------|--------------|--------|
+| D1 database | `DB` | `ciallo-ti-ratings` |
+
+数据库表由 `functions/api/ratings/[characterId].js` 在首次请求时自动创建，无需手动建表。
+
+### Pages Functions API
+
+`GET /api/ratings/:characterId` — 获取匹配次数和评分统计
+
+`POST /api/ratings/:characterId` — 提交匹配记录（`action: "match"`）或评分（`action: "rate"`，需附 `rating` 和 `session_id`）
 
 ---
 

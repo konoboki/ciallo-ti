@@ -134,7 +134,6 @@ GITHUB_PAGES=true pnpm build
 - **[SBTI](https://www.bilibili.com/video/BV1LpDHByET6/)** — B 站 SBTI 测试视频，提供了创意灵感
 
 感谢以上创作者的开创性工作。
-
 ---
 
 ## 免责声明

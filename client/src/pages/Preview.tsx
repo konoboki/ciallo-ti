@@ -208,7 +208,7 @@ export default function Preview() {
                   </h3>
                   <p className="text-sm text-gray-400 mt-1">{char.game}</p>
                   <div className="mt-4 text-center">
-                    <p className="text-xs text-gray-400 mb-1">角色 MBTI</p>
+                    <p className="text-xs text-gray-400 mb-1">角色特征</p>
                     <span className="text-xl font-black" style={{ color: "#FF8C42" }}>{char.mbti}</span>
                   </div>
                 </div>

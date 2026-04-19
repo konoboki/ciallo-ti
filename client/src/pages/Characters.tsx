@@ -14,6 +14,7 @@ export default function Characters() {
   const [, navigate] = useLocation();
   const [selectedGame, setSelectedGame] = useState<string>("all");
   const [selectedChar, setSelectedChar] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const games = getGameList();
 
   const filtered = selectedGame === "all"
@@ -125,6 +126,37 @@ export default function Characters() {
         </div>
       </div>
 
+      {/* 全图灯箱 */}
+      <AnimatePresence>
+        {lightboxImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 cursor-zoom-out"
+            onClick={() => setLightboxImage(null)}
+          >
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.img
+              src={lightboxImage}
+              alt="full"
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ type: "spring", damping: 22 }}
+              className="relative max-h-[90vh] max-w-full object-contain rounded-2xl shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors"
+            >
+              <X size={20} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 角色详情弹窗 */}
       <AnimatePresence>
         {activeChar && (
@@ -146,18 +178,24 @@ export default function Characters() {
             >
               {/* 立绘 / 色块头部 */}
               <div
-                className="h-48 flex flex-col items-center justify-center relative overflow-hidden"
-                style={{ background: `linear-gradient(135deg, ${activeChar.color}cc, ${activeChar.color}44)` }}
+                className="relative overflow-hidden flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${activeChar.color}cc, ${activeChar.color}44)`,
+                  minHeight: activeChar.image ? "0" : "12rem",
+                }}
               >
                 {activeChar.image ? (
                   <img
                     src={activeChar.image}
                     alt={activeChar.name}
-                    className="absolute inset-0 w-full h-full object-cover object-top"
+                    className="block mx-auto cursor-zoom-in"
+                    style={{ width: "70%", objectFit: "contain", objectPosition: "center top" }}
+                    onClick={(e) => { e.stopPropagation(); setLightboxImage(activeChar.image!); }}
+                    title="点击查看原图"
                   />
                 ) : (
                   <span
-                    className="text-6xl font-black select-none"
+                    className="text-6xl font-black select-none py-10"
                     style={{ color: "rgba(50,50,50,0.25)", fontFamily: "'Noto Serif SC', serif" }}
                   >
                     {activeChar.name.charAt(0)}

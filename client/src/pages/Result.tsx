@@ -120,8 +120,8 @@ export default function Result() {
               <img
                 src={char.image}
                 alt={char.name}
-                className="w-full block"
-                style={{ maxHeight: "72vw", objectFit: "contain", objectPosition: "center top" }}
+                className="block mx-auto"
+                style={{ width: "66.67%", maxHeight: "48vw", objectFit: "contain", objectPosition: "center top" }}
               />
             ) : (
               <div className="py-14 flex flex-col items-center">

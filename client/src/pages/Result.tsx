@@ -300,7 +300,7 @@ export default function Result() {
               <p className="text-sm text-gray-400 mt-0.5">{char.game}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-400 mb-1">角色 MBTI</p>
+              <p className="text-xs text-gray-400 mb-1">角色特征</p>
               <span className="text-xl font-black" style={{ color: "#FF8C42" }}>{char.mbti}</span>
             </div>
           </div>

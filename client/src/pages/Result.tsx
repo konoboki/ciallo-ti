@@ -286,21 +286,19 @@ export default function Result() {
           </div>
 
           {/* 角色信息 */}
-          <div className="px-6 py-5 bg-white flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold mb-1 text-black">
-                最适合结婚的角色
-              </p>
-              <h3
-                className="text-xl font-bold"
-                style={{ fontFamily: "'Noto Serif SC', serif", color: "#FF8C42" }}
-              >
-                {char.name}
-              </h3>
-              <p className="text-sm text-gray-400 mt-0.5">{char.game}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-gray-400 mb-1">角色特征</p>
+          <div className="px-6 py-5 bg-white flex flex-col items-center justify-center text-center">
+            <p className="text-lg font-black mb-3 text-black">
+              最适合结婚的角色 (∠·ω )⌚★
+            </p>
+            <h3
+              className="text-3xl font-black"
+              style={{ fontFamily: "'Noto Serif SC', serif", color: "#FF8C42" }}
+            >
+              {char.name}
+            </h3>
+            <p className="text-sm text-gray-400 mt-1">{char.game}</p>
+            <div className="mt-4 text-center">
+              <p className="text-xs text-gray-400 mb-1">角色 MBTI</p>
               <span className="text-xl font-black" style={{ color: "#FF8C42" }}>{char.mbti}</span>
             </div>
           </div>

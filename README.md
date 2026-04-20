@@ -24,19 +24,19 @@ ciallo_ti 是一个基于 MBTI 人格类型的柚子社（YUZUSOFT）Galgame 角
 
 | 维度 | 含义 | A 选项倾向 | B 选项倾向 | 题号 |
 |------|------|-----------|-----------|------|
-| E/I | 外向 / 内向 | 见题目映射（Q2/Q3 为反向） | 见题目映射（Q2/Q3 为反向） | Q1–Q6 |
-| S/N | 实感 / 直觉 | S（实感） | N（直觉） | Q7–Q12 |
-| T/F | 思考 / 情感 | T（思考） | F（情感） | Q13–Q18 |
-| J/P | 判断 / 感知 | J（判断） | P（感知） | Q19–Q24 |
+| E/I | 外向 / 内向 | 见题目映射（含反向题） | 见题目映射（含反向题） | Q1–Q6 |
+| S/N | 实感 / 直觉 | 见题目映射（含反向题） | 见题目映射（含反向题） | Q7–Q12 |
+| T/F | 思考 / 情感 | 见题目映射（含反向题） | 见题目映射（含反向题） | Q13–Q18 |
+| J/P | 判断 / 感知 | 见题目映射（含反向题） | 见题目映射（含反向题） | Q19–Q24 |
 
 ### 计分规则
 
 这版按题号直接映射计分：
 
-- **E / I**：Q1A→E，Q1B→I；Q2A→I，Q2B→E；Q3A→I，Q3B→E；Q4A→E，Q4B→I；Q5A→E，Q5B→I；Q6A→E，Q6B→I
-- **S / N**：Q7A→S，Q7B→N；Q8A→S，Q8B→N；Q9A→S，Q9B→N；Q10A→S，Q10B→N；Q11A→S，Q11B→N；Q12A→S，Q12B→N
-- **T / F**：Q13A→T，Q13B→F；Q14A→T，Q14B→F；Q15A→T，Q15B→F；Q16A→T，Q16B→F；Q17A→T，Q17B→F；Q18A→T，Q18B→F
-- **J / P**：Q19A→J，Q19B→P；Q20A→J，Q20B→P；Q21A→J，Q21B→P；Q22A→J，Q22B→P；Q23A→J，Q23B→P；Q24A→J，Q24B→P
+- **E / I**：Q1A→I，Q1B→E；Q2A→E，Q2B→I；Q3A→I，Q3B→E；Q4A→I，Q4B→E；Q5A→E，Q5B→I；Q6A→E，Q6B→I
+- **S / N**：Q7A→N，Q7B→S；Q8A→N，Q8B→S；Q9A→S，Q9B→N；Q10A→S，Q10B→N；Q11A→N，Q11B→S；Q12A→S，Q12B→N
+- **T / F**：Q13A→F，Q13B→T；Q14A→T，Q14B→F；Q15A→T，Q15B→F；Q16A→F，Q16B→T；Q17A→T，Q17B→F；Q18A→T，Q18B→F
+- **J / P**：Q19A→J，Q19B→P；Q20A→J，Q20B→P；Q21A→P，Q21B→J；Q22A→J，Q22B→P；Q23A→J，Q23B→P；Q24A→P，Q24B→J
 
 每个维度各自累计分数后进行比较（如 E vs I），分高者即为该维度结果。
 

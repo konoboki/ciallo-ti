@@ -1,0 +1,18 @@
+name = "ciallo-ti"
+compatibility_date = "2026-04-19"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare Pages will read this during git builds.
+pages_build_output_dir = "dist"
+
+[observability]
+enabled = true
+
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ciallo-ti-ratings"
+database_id = "6053966c-933e-4670-966f-562b9fef2daa"

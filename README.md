@@ -123,8 +123,26 @@ pnpm check
 | 项目 | 值 |
 |------|----|  
 | 构建命令 | `pnpm build` |
-| 输出目录 | `dist/public` |
+| 输出目录 | `dist` |
 | Node.js 版本 | 22 |
+
+
+
+### 常见构建失败排查
+
+如果 Cloudflare 日志里出现：
+
+```
+ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND No package.json ...
+```
+
+通常不是依赖问题，而是 **Pages 绑定了错误分支或错误根目录**。请确认：
+
+1. **Production branch** 选择项目源码分支（例如 `main`），不要选只存放静态产物的分支（如历史 `gh-pages`）。
+2. **Root directory** 设为仓库根目录（`/`），因为 `package.json` 在根目录。
+3. 构建命令保持 `pnpm run build`，输出目录为 `dist`。
+
+仓库已添加 `wrangler.toml` 并声明 `pages_build_output_dir = "dist"`，Cloudflare 在 Git 构建时可自动读取该配置。
 
 ### D1 数据库绑定
 

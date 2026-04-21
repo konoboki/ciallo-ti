@@ -21,6 +21,9 @@ v1.0.1
 v1.1.0
 这两天还挺忙的，大更新得等明天晚上
 
+v1.1.1
+新增角色：阳见惠凪（陽見 恵凪）、めら あずさ（布良梓），并更新 ENFJ/ISTJ 匹配结果。
+
 ---
 
 ## 题目设计与评分标准
@@ -79,10 +82,10 @@ v1.1.0
 | INTJ | 因幡巡 | ENFP | 魔女的夜宴 |
 | ENTP | 绫地宁宁 | INFJ | 魔女的夜宴 |
 | INFJ | 谷风天音 | ENTP | 天使☆嚣嚣 RE-BOOT! |
-| ENFJ | 三司绫濑 | INFP | RIDDLE JOKER |
+| ENFJ | 阳见惠凪（陽見 恵凪） | INFP | ライムライト・レモネードジャム |
 | ENTJ | 三司绫濑 | INFP | RIDDLE JOKER |
 | ISFJ | 仮屋和奏 | ESFP | 魔女的夜宴 |
-| ISTJ | 仮屋和奏 | ESFP | 魔女的夜宴 |
+| ISTJ | 布良梓（めら あずさ） | ISFJ | DRACU-RIOT! |
 | ESFJ | 在原七海 | ISFJ | RIDDLE JOKER |
 | ESTJ | 汐山凉音 | ISTJ | 星光咖啡馆与死神之蝶 |
 | ISFP | 马庭芦花 | ESFJ | 千恋＊万花 |

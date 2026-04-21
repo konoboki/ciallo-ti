@@ -18,5 +18,17 @@
       "database_name": "ciallo-ti-ratings",
       "database_id": "6053966c-933e-4670-966f-562b9fef2daa"
     }
-  ]
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "ciallo-ti-kv",
+      "preview_id": "ciallo-ti-kv-preview"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "0 * * * *"
+    ]
+  }
 }

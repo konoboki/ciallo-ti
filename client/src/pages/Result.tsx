@@ -29,6 +29,12 @@ interface RatingStats {
   avg_rating: number;
 }
 
+interface ProbabilityCache {
+  timestamp: number;
+  total_matches: number;
+  probabilities: Record<string, { count: number; percentage: number }>;
+}
+
 /** 调用 Pages Functions API 获取角色统计 */
 async function fetchStats(characterId: string): Promise<RatingStats | null> {
   try {
@@ -163,6 +169,7 @@ export default function Result() {
   const [stats, setStats] = useState<RatingStats | null>(null);
   const [myRating, setMyRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
+  const [matchPercentage, setMatchPercentage] = useState<number | null>(null);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("mbtiResult");
@@ -176,12 +183,24 @@ export default function Result() {
 
   const char = result ? getMatchedCharacter(result.mbti) : null;
 
-  // 加载统计数据
+  // 加载统计数据和概率缓存
   useEffect(() => {
     if (!char?.id) return;
     fetchStats(char.id).then((data) => {
       if (data) setStats(data);
     });
+    
+    // 从 KV 读取概率缓存
+    fetch("/api/probability-cache")
+      .then(res => res.json())
+      .then((cache: ProbabilityCache) => {
+        if (cache?.probabilities?.[char.id]) {
+          setMatchPercentage(cache.probabilities[char.id].percentage);
+        }
+      })
+      .catch(() => {
+        // 缓存读取失败，不显示概率
+      });
   }, [char?.id]);
 
   // 记录匹配次数（只记录一次）
@@ -233,6 +252,7 @@ export default function Result() {
   const matchCount = stats?.match_count ?? 0;
   const avgRating = stats && stats.rating_count > 0 ? stats.avg_rating : null;
   const ratingCount = stats?.rating_count ?? 0;
+  const percentageDisplay = matchPercentage !== null ? `${matchPercentage}%` : "计算中...";
 
   function handleShare() {
     const text = `我最适合和柚子社的「${char!.name}」结婚！快来测测你的结果吧～ ciallomeow.com`;
@@ -316,7 +336,7 @@ export default function Result() {
           className="mt-4 rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50 px-5 py-5"
         >
           {/* 计数行 */}
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4 mb-4 flex-wrap">
             <div className="flex items-center gap-1.5 text-sm text-gray-500">
               <Heart size={14} className="text-orange-400" fill="#FF8C42" />
               <span>
@@ -324,6 +344,12 @@ export default function Result() {
                 与 {char.name} 配对
               </span>
             </div>
+            {matchPercentage !== null && (
+              <div className="flex items-center gap-1 text-sm text-gray-500">
+                <span className="text-gray-400">·</span>
+                <span>匹配概率 <span className="font-bold text-orange-500">{percentageDisplay}</span></span>
+              </div>
+            )}
             {avgRating !== null && ratingCount > 0 && (
               <div className="flex items-center gap-1 text-sm text-gray-500 ml-auto">
                 <Star size={13} fill="#FF8C42" stroke="#FF8C42" />

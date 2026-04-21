@@ -1,5 +1,5 @@
 // Cloudflare Pages Functions - 角色评分 API
-// GET  /api/ratings/:characterId  → 获取统计
+// GET  /api/ratings/:characterId  → 获取统计（不含概率，概率从 KV 读）
 // POST /api/ratings/:characterId  → 提交匹配或评分
 
 const CORS = {
@@ -10,14 +10,14 @@ const CORS = {
 };
 
 async function initTables(db) {
- await db.prepare(`
+  await db.prepare(`
     CREATE TABLE IF NOT EXISTS character_stats (
       character_id TEXT PRIMARY KEY,
       match_count INTEGER NOT NULL DEFAULT 0,
       rating_count INTEGER NOT NULL DEFAULT 0,
       rating_sum INTEGER NOT NULL DEFAULT 0,
       updated_at INTEGER NOT NULL DEFAULT (unixepoch())
-      )
+    )
   `).run();
 
   await db.prepare(`
@@ -28,7 +28,7 @@ async function initTables(db) {
       rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
       created_at INTEGER NOT NULL DEFAULT (unixepoch()),
       UNIQUE(character_id, session_id)
-      )
+    )
   `).run();
 }
 
@@ -65,6 +65,7 @@ export async function onRequestPost({ params, env, request }) {
     const body = await request.json();
 
     if (body.action === "match") {
+      // 只记录 match_count，不记录 MBTI（概率由 Cron 聚合计算）
       await env.DB.prepare(`
         INSERT INTO character_stats (character_id, match_count, rating_count, rating_sum, updated_at)
         VALUES (?, 1, 0, 0, unixepoch())

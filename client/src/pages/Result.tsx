@@ -157,6 +157,8 @@ export default function Result() {
   const sessionId = useRef(getSessionId());
   const recordedRef = useRef(false);
 
+
+
   // 评分/统计状态
   const [stats, setStats] = useState<RatingStats | null>(null);
   const [myRating, setMyRating] = useState<number | null>(null);
@@ -213,6 +215,8 @@ export default function Result() {
     }
   };
 
+
+
   if (!result || !char) return null;
 
   const matchDesc = getMatchDescription(result.mbti);
@@ -231,7 +235,7 @@ export default function Result() {
   const ratingCount = stats?.rating_count ?? 0;
 
   function handleShare() {
-    const text = `我的MBTI是 ${result!.mbti}，最适合和柚子社的「${char!.name}」结婚！快来测测你的结果吧～`;
+    const text = `我最适合和柚子社的「${char!.name}」结婚！快来测测你的结果吧～ ciallomeow.com`;
     if (navigator.share) {
       navigator.share({ text }).catch(() => {});
     } else if (navigator.clipboard) {
@@ -448,25 +452,24 @@ export default function Result() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="flex gap-3"
+          className="flex flex-col gap-3"
         >
-          <button
-            onClick={() => { sessionStorage.removeItem("mbtiResult"); navigate("/quiz"); }}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200
-              text-sm font-medium text-gray-500 hover:bg-gray-50 transition-all"
-          >
-            <RotateCcw size={15} /> 重新测试
-          </button>
-          <button
-            onClick={handleShare}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all"
-            style={{
-              background: "linear-gradient(135deg, #FF8C42, #FF6B1A)",
-              boxShadow: "0 4px 16px rgba(255,140,66,0.35)",
-            }}
-          >
-            <Share2 size={15} /> 分享结果
-          </button>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => { sessionStorage.removeItem("mbtiResult"); navigate("/quiz"); }}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200
+                text-sm font-medium text-gray-500 hover:bg-gray-50 transition-all"
+            >
+              <RotateCcw size={15} /> 重新测试
+            </button>
+            <button
+              onClick={handleShare}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:bg-gray-50 transition-all"
+            >
+              <Share2 size={15} /> 分享文字
+            </button>
+          </div>
         </motion.div>
 
         <div className="text-center mt-5">
@@ -482,6 +485,8 @@ export default function Result() {
           ciallo_ti · 非官方粉丝作品 · 角色及作品版权归 YUZUSOFT 所有
         </p>
       </div>
+
+
     </div>
   );
 }

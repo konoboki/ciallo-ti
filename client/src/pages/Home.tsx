@@ -93,7 +93,7 @@ export default function Home() {
                 </div>
 
                 {/* GitHub Star */}
-                <div className="mt-6 flex flex-col items-center lg:items-start gap-1">
+                <div className="mt-6 flex flex-col items-start gap-1">
                   <a
                     href="https://github.com/konoboki/ciallo-ti"
                     target="_blank"

@@ -24,11 +24,18 @@ async function buildProbabilityCache(env) {
   const probabilities = {};
   for (const row of rows) {
     const count = row.match_count || 0;
+    let percentage = totalMatches > 0
+      ? Math.round((count / totalMatches) * 1000) / 10
+      : 0;
+    
+    // 栞那之前占两个位置，现在概率除以 2
+    if (row.character_id === "kanna") {
+      percentage = Math.round(percentage * 100) / 200;
+    }
+    
     probabilities[row.character_id] = {
       count,
-      percentage: totalMatches > 0
-        ? Math.round((count / totalMatches) * 1000) / 10
-        : 0,
+      percentage,
     };
   }
 

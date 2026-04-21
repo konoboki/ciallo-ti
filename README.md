@@ -166,7 +166,6 @@ pnpm check
 |------|--------------|--------|
 | D1 database | `DB` | `ciallo-ti-ratings` |
 
-数据库表由 `functions/api/ratings/[characterId].js` 在首次请求时自动创建，无需手动建表。
 
 ### Pages Functions API
 

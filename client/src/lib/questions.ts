@@ -260,7 +260,7 @@ export const questions: Question[] = [
 /**
  * 根据答案计算 MBTI 类型
  * 按题目定义计分：每题的 A/B 选项对应指定维度字母 +1
- * 平分时默认偏向 I/N/F/P（内倾偏向）
+ * 平分时使用指定决胜题：EI→Q4，SN→Q12，TF→Q18，JP→Q21
  */
 export function calculateMbti(answers: Answer[]): MbtiResult {
   const s = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
@@ -295,12 +295,27 @@ export function calculateMbti(answers: Answer[]): MbtiResult {
     JP: s.J === s.P,
   };
 
-  // 平分时默认取 I/N/F/P
+  const getTieBreakLetter = (questionId: number): DimLetter | null => {
+    const answer = answers.find(a => a.questionId === questionId);
+    if (!answer) return null;
+    const q = questions.find(item => item.id === questionId);
+    if (!q) return null;
+    return answer.choice === "A" ? q._scoreA : q._scoreB;
+  };
+
+  const tieBreak = {
+    EI: getTieBreakLetter(4),
+    SN: getTieBreakLetter(12),
+    TF: getTieBreakLetter(18),
+    JP: getTieBreakLetter(21),
+  };
+
+  // 平分时按指定决胜题判定（异常缺失时再回退到右侧字母）
   const mbti = [
-    s.E > s.I ? "E" : "I",
-    s.S > s.N ? "S" : "N",
-    s.T > s.F ? "T" : "F",
-    s.J > s.P ? "J" : "P",
+    s.E === s.I ? (tieBreak.EI === "E" ? "E" : "I") : s.E > s.I ? "E" : "I",
+    s.S === s.N ? (tieBreak.SN === "S" ? "S" : "N") : s.S > s.N ? "S" : "N",
+    s.T === s.F ? (tieBreak.TF === "T" ? "T" : "F") : s.T > s.F ? "T" : "F",
+    s.J === s.P ? (tieBreak.JP === "J" ? "J" : "P") : s.J > s.P ? "J" : "P",
   ].join("");
 
   return { mbti, scores: s, ratios, balanced };

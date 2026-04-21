@@ -20,7 +20,7 @@ export const characters: Character[] = [
     name: "明月栞那",
     nameJa: "明月 栞那",
     game: "星光咖啡馆与死神之蝶",
-    mbti: "花洒的主人",
+    mbti: "花洒死神",
     color: "#D5E8C5",
     image: `/characters/mitsuki-kanna.png`,
     description: 'INFP / INTP 往往会被那种"懂你的情绪、又能温柔把你拉回现实"的人打动。明月栞那身上最强的是很外放的照顾欲和关系感：会用做饭、安抚、提醒、鼓励这种很具体的方式去接住别人，还会敏锐察觉对方什么时候在往负面里陷。对你来说，这种既温柔又主动的感觉，很像把你心里那团乱糟糟的感受轻轻整理好。',

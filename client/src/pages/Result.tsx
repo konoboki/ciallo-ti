@@ -495,6 +495,21 @@ export default function Result() {
             >
               <Share2 size={15} /> 分享文字
             </button>
+            <div className="flex-1 flex flex-col items-center justify-center">
+              <a
+                href="https://github.com/yuzu-soft/ciallo-ti"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
+                style={{
+                  background: "#1a1a1a",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+                }}
+              >
+                <Star size={15} fill="#FFD700" style={{ color: "#FFD700" }} /> 给项目 Star
+              </a>
+              <p className="text-xs text-gray-400 mt-2 text-center">球球了这对我真的很有帮助</p>
+            </div>
           </div>
         </motion.div>
 

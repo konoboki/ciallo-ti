@@ -16,3 +16,11 @@ not_found_handling = "single-page-application"
 binding = "DB"
 database_name = "ciallo-ti-ratings"
 database_id = "6053966c-933e-4670-966f-562b9fef2daa"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "c067095057a54d7da31aa9a94a96708a"
+preview_id = "b9fd0ff7309143379c1f715fe90de873"
+
+[triggers]
+crons = ["0 * * * *"]

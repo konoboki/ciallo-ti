@@ -5,7 +5,7 @@
  */
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
-import { Sparkles, BookOpen, ArrowRight } from "lucide-react";
+import { Sparkles, BookOpen, ArrowRight, Star } from "lucide-react";
 
 const YUZU_LOGO = `/cialloti-logo.jpg`;
 
@@ -90,6 +90,20 @@ export default function Home() {
                     <BookOpen size={18} />
                     角色图鉴
                   </button>
+                </div>
+
+                {/* GitHub Star */}
+                <div className="mt-6 flex flex-col items-center lg:items-start gap-1">
+                  <a
+                    href="https://github.com/konoboki/ciallo-ti"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-gray-900 text-white hover:bg-gray-700 transition-all shadow-sm"
+                  >
+                    <Star size={16} className="fill-yellow-400 text-yellow-400" />
+                    给项目 Star
+                  </a>
+                  <p className="text-xs text-foreground/40">球球了这对我真的很有帮助</p>
                 </div>
               </motion.div>
             </div>

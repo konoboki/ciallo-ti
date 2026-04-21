@@ -122,9 +122,14 @@ pnpm check
 
 | 项目 | 值 |
 |------|----|  
+| Root directory | `/`（必须是仓库根目录，否则会找不到 `package.json`） |
 | 构建命令 | `pnpm build` |
 | 输出目录 | `dist` |
 | Node.js 版本 | 22 |
+
+> 如果你在 Cloudflare Pages 日志里看到  
+> `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND No package.json ... /opt/buildhome/repo`，  
+> 基本就是 Root directory 不是 `/` 导致的。把 Root directory 改回仓库根目录后重新部署即可。
 
 
 

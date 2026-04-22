@@ -260,7 +260,7 @@ export const questions: Question[] = [
 /**
  * 根据答案计算 MBTI 类型
  * 按题目定义计分：每题的 A/B 选项对应指定维度字母 +1
- * 平分时默认偏向 I/N/F/P（内倾偏向）
+ * 平分时使用指定题目作为决胜题：EI 看 Q4、SN 看 Q12、TF 看 Q18、JP 看 Q21
  */
 export function calculateMbti(answers: Answer[]): MbtiResult {
   const s = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
@@ -295,12 +295,19 @@ export function calculateMbti(answers: Answer[]): MbtiResult {
     JP: s.J === s.P,
   };
 
-  // 平分时默认取 I/N/F/P
+  // 平分时使用决胜题：EI 看 Q4、SN 看 Q12、TF 看 Q18、JP 看 Q21
+  const getTieBreakLetter = (questionId: number, fallback: "E" | "I" | "S" | "N" | "T" | "F" | "J" | "P") => {
+    const tieBreakAnswer = answers.find((ans) => ans.questionId === questionId);
+    const tieBreakQuestion = questions.find((q) => q.id === questionId);
+    if (!tieBreakAnswer || !tieBreakQuestion) return fallback;
+    return tieBreakAnswer.choice === "A" ? tieBreakQuestion._scoreA : tieBreakQuestion._scoreB;
+  };
+
   const mbti = [
-    s.E > s.I ? "E" : "I",
-    s.S > s.N ? "S" : "N",
-    s.T > s.F ? "T" : "F",
-    s.J > s.P ? "J" : "P",
+    s.E > s.I ? "E" : s.E < s.I ? "I" : getTieBreakLetter(4, "I"),
+    s.S > s.N ? "S" : s.S < s.N ? "N" : getTieBreakLetter(12, "N"),
+    s.T > s.F ? "T" : s.T < s.F ? "F" : getTieBreakLetter(18, "F"),
+    s.J > s.P ? "J" : s.J < s.P ? "P" : getTieBreakLetter(21, "P"),
   ].join("");
 
   return { mbti, scores: s, ratios, balanced };

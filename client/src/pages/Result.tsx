@@ -497,7 +497,7 @@ export default function Result() {
             </button>
             <div className="flex-1 flex flex-col items-center justify-center">
               <a
-                href="https://github.com/yuzu-soft/ciallo-ti"
+                href="https://github.com/konoboki/ciallo-ti"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"

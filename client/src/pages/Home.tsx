@@ -104,7 +104,7 @@ export default function Home() {
                       <Star size={16} className="fill-yellow-400 text-yellow-400" />
                       给项目 Star
                     </a>
-                    <p className="text-xs text-foreground/40">球球了这对我真的很有帮助</p>
+                    <p className="text-xs text-foreground/40">喜欢的话给个star吧(∠·ω· )⌒★</p>
                   </div>
                 </div>
               </motion.div>

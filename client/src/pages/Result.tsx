@@ -508,7 +508,7 @@ export default function Result() {
               >
                 <Star size={15} fill="#FFD700" style={{ color: "#FFD700" }} /> 给项目 Star
               </a>
-              <p className="text-xs text-gray-400 mt-2 text-center">球球了这对我真的很有帮助</p>
+              <p className="text-xs text-gray-400 mt-2 text-center">喜欢的话给个star吧(∠·ω· )⌒★</p>
             </div>
           </div>
         </motion.div>

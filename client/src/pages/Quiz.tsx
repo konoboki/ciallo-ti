@@ -2,7 +2,7 @@
  * Quiz - 二选一情境题测试页面
  * 24道题，每题选 A 或 B，不显示维度信息
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { questions, calculateMbti, type Answer, type Choice } from "@/lib/questions";
@@ -15,6 +15,8 @@ export default function Quiz() {
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, Choice>>({});
   const [dir, setDir] = useState<1 | -1>(1);
+  const movingRef = useRef(false);
+  const timerRef = useRef<number | null>(null);
 
   const q = questions[idx];
   const progress = (idx / questions.length) * 100;
@@ -35,11 +37,31 @@ export default function Quiz() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, answers]);
 
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
   function pick(choice: Choice) {
+    if (movingRef.current) return;
+
+    movingRef.current = true;
+
     const next = { ...answers, [q.id]: choice };
     setAnswers(next);
+
     if (idx < questions.length - 1) {
-      setTimeout(() => { setDir(1); setIdx(i => i + 1); }, 300);
+      timerRef.current = window.setTimeout(() => {
+        setDir(1);
+        setIdx(i => i + 1);
+        movingRef.current = false;
+        timerRef.current = null;
+      }, 300);
+    } else {
+      movingRef.current = false;
     }
   }
 

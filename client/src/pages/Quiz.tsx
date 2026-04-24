@@ -76,6 +76,7 @@ export default function Quiz() {
     }));
     const result = calculateMbti(answerList);
     sessionStorage.setItem("mbtiResult", JSON.stringify(result));
+    sessionStorage.setItem("mbtiAnswers", JSON.stringify(answerList));
     navigate("/result");
   }
 

@@ -7,7 +7,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { getMatchedCharacter, getMatchDescription } from "@/lib/characters";
-import type { MbtiResult } from "@/lib/questions";
+import type { MbtiResult, Answer } from "@/lib/questions";
 import { RotateCcw, Share2, Users, Star, Heart } from "lucide-react";
 import { toast } from "sonner";
 
@@ -56,6 +56,22 @@ async function postMatch(characterId: string): Promise<void> {
     });
   } catch {
     // 静默失败
+  }
+}
+
+async function postQuizAnalytics(mbti: string, characterId: string, answers: Answer[]): Promise<void> {
+  try {
+    await fetch("/api/quiz-analytics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mbti,
+        character_id: characterId,
+        answers,
+      }),
+    });
+  } catch {
+    // 静默失败，不影响结果页
   }
 }
 
@@ -162,6 +178,7 @@ export default function Result() {
   const [result, setResult] = useState<MbtiResult | null>(null);
   const sessionId = useRef(getSessionId());
   const recordedRef = useRef(false);
+  const analyticsRecordedRef = useRef(false);
 
 
 
@@ -214,6 +231,42 @@ export default function Result() {
       });
     }
   }, [char?.id]);
+
+  useEffect(() => {
+    if (!result || !char?.id || analyticsRecordedRef.current) return;
+
+    const storageKey = `quiz_analytics_recorded_${result.mbti}_${char.id}`;
+    if (sessionStorage.getItem(storageKey) === "1") {
+      analyticsRecordedRef.current = true;
+      return;
+    }
+
+    const rawAnswers = sessionStorage.getItem("mbtiAnswers");
+    if (!rawAnswers) {
+      analyticsRecordedRef.current = true;
+      return;
+    }
+
+    let answers: Answer[] | null = null;
+    try {
+      answers = JSON.parse(rawAnswers) as Answer[];
+      if (!Array.isArray(answers)) {
+        answers = null;
+      }
+    } catch {
+      answers = null;
+    }
+
+    if (!answers) {
+      analyticsRecordedRef.current = true;
+      return;
+    }
+
+    analyticsRecordedRef.current = true;
+    postQuizAnalytics(result.mbti, char.id, answers).finally(() => {
+      sessionStorage.setItem(storageKey, "1");
+    });
+  }, [result, char?.id]);
 
   // 提交评分
   const handleRate = async (rating: number) => {
@@ -483,7 +536,11 @@ export default function Result() {
 
           <div className="flex gap-3">
             <button
-              onClick={() => { sessionStorage.removeItem("mbtiResult"); navigate("/quiz"); }}
+              onClick={() => {
+                sessionStorage.removeItem("mbtiResult");
+                sessionStorage.removeItem("mbtiAnswers");
+                navigate("/quiz");
+              }}
               className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200
                 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-all"
             >

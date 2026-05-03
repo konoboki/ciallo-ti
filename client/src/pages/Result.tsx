@@ -198,7 +198,12 @@ export default function Result() {
     }
   }, [navigate]);
 
-  const char = result ? getMatchedCharacter(result.mbti) : null;
+  const srIdentity = result && result.mode === "extended"
+    ? result.scores.stable === result.scores.reflective
+      ? ((JSON.parse(sessionStorage.getItem("mbtiAnswers") ?? "[]") as Answer[]).find((a) => a.questionId === 28)?.choice === "B" ? "R" : "S")
+      : (result.scores.reflective > result.scores.stable ? "R" : "S")
+    : "S";
+  const char = result ? getMatchedCharacter(result.mbti, result.mode ?? "popular", srIdentity) : null;
 
   // 加载统计数据和概率缓存
   useEffect(() => {

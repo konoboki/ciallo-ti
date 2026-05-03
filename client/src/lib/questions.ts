@@ -4,7 +4,9 @@
  * 维度信息仅用于计分，不在 UI 中展示
  */
 
-export type DimPair = "EI" | "SN" | "TF" | "JP";
+export type QuizMode = "popular" | "extended";
+
+export type DimPair = "EI" | "SN" | "TF" | "JP" | "SR";
 export type Choice = "A" | "B";
 export type DimLetter = "E" | "I" | "S" | "N" | "T" | "F" | "J" | "P";
 
@@ -26,9 +28,10 @@ export interface Answer {
 
 export interface MbtiResult {
   mbti: string;
-  scores: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number };
-  ratios: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number };
-  balanced: { EI: boolean; SN: boolean; TF: boolean; JP: boolean };
+  mode: QuizMode;
+  scores: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number; stable: number; reflective: number };
+  ratios: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number; stable: number; reflective: number };
+  balanced: { EI: boolean; SN: boolean; TF: boolean; JP: boolean; SR: boolean };
 }
 
 export const questions: Question[] = [
@@ -37,7 +40,7 @@ export const questions: Question[] = [
     id: 1,
     text: "放学路上，平时只偶尔见面的学妹主动朝你挥手打招呼。你更可能：",
     optionA: "礼貌回应，但会等对方继续带话题",
-    optionB: "立刻自然接话，顺势多聊两句",
+    optionB: "自然接话，顺势补一句近况或玩笑",
     _dim: "EI",
     _scoreA: "I",
     _scoreB: "E",
@@ -45,7 +48,7 @@ export const questions: Question[] = [
   {
     id: 2,
     text: "朋友把你拉去参加联谊，现场有个很可爱的转学生坐在你旁边。你通常会：",
-    optionA: "主动先开一个轻松的话题",
+    optionA: "用现场的话题先轻松搭一句话",
     optionB: "先观察她的反应，再决定说什么",
     _dim: "EI",
     _scoreA: "E",
@@ -54,8 +57,8 @@ export const questions: Question[] = [
   {
     id: 3,
     text: "你被拉进一个小群，里面有你有点在意的人。群里气氛很好。你更像：",
-    optionA: "先看大家在聊什么，找到合适节点再发言",
-    optionB: "很快就加入聊天，想到什么先说出来",
+    optionA: "先看几轮大家在聊什么，再找自然的时机发言",
+    optionB: "看到能接上的话题就顺手回应，先让自己融进去",
     _dim: "EI",
     _scoreA: "I",
     _scoreB: "E",
@@ -101,7 +104,7 @@ export const questions: Question[] = [
   {
     id: 8,
     text: "喜欢的人送了你一个小礼物。你的第一反应更像：",
-    optionA: "会先想到这份礼物背后是不是有特别心意",
+    optionA: "会想到这份礼物是不是代表了某种特别心意",
     optionB: "会先注意它是什么、怎么选的、什么时候准备的",
     _dim: "SN",
     _scoreA: "N",
@@ -184,8 +187,8 @@ export const questions: Question[] = [
   {
     id: 17,
     text: "你喜欢的人和朋友闹矛盾，来找你倾诉。你更自然会：",
-    optionA: "帮她理清谁的问题、怎么解决",
-    optionB: "先陪她把委屈说完，再慢慢安慰她",
+    optionA: "先听清楚事情经过，再帮她理清问题和下一步怎么做",
+    optionB: "先陪她把委屈说出来，让她情绪缓下来",
     _dim: "TF",
     _scoreA: "T",
     _scoreB: "F",
@@ -213,8 +216,8 @@ export const questions: Question[] = [
   {
     id: 20,
     text: "第一次约会当天突然下雨，原计划全乱了。你更可能：",
-    optionA: "很快换成备选安排，想办法把节奏稳住",
-    optionB: "接受变化，干脆根据现场感觉重新玩",
+    optionA: "很快切到室内备选安排，让约会节奏继续稳住",
+    optionB: "把下雨当成临时剧情，现场找附近有趣的地方",
     _dim: "JP",
     _scoreA: "J",
     _scoreB: "P",
@@ -249,33 +252,69 @@ export const questions: Question[] = [
   {
     id: 24,
     text: "关系刚开始升温时，你更希望：",
-    optionA: "保持自然发展，不想太早被框住",
-    optionB: "节奏清晰一点，知道下一步大概怎么走",
+    optionA: "保持自然发展，不急着马上定义关系",
+    optionB: "对节奏有把握，知道下一步大概怎么走",
     _dim: "JP",
     _scoreA: "P",
     _scoreB: "J",
   },
 ];
 
+
+export type IdentityLabel = "STABLE" | "REFLECTIVE";
+
+export interface IdentityQuestion {
+  id: number;
+  text: string;
+  optionA: string;
+  optionB: string;
+  _dim: "SR";
+  _scoreA: "STABLE";
+  _scoreB: "REFLECTIVE";
+}
+
+export const identityQuestions = [
+  { id: 25, text: "和喜欢的人约会结束后，对方只回了一句“今天挺开心的”。你更可能：", optionA: "觉得这已经是不错的回应，不会过度多想", optionB: "思考她是不是只是客套，哪里还能做得更好", _dim: "SR", _scoreA: "STABLE", _scoreB: "REFLECTIVE" },
+  { id: 26, text: "你精心准备的聊天话题，对方反应比你预想中冷淡。你通常会：", optionA: "先接受这次气氛一般，下次再聊", optionB: "马上回想自己是不是说错了话，开始分析原因", _dim: "SR", _scoreA: "STABLE", _scoreB: "REFLECTIVE" },
+  { id: 27, text: "朋友说你和某个同学很般配，但也顺口吐槽了你一个缺点。你更像：", optionA: "听听就过，不太会因为一句评价影响自己", optionB: "会考虑自己是不是确实该改", _dim: "SR", _scoreA: "STABLE", _scoreB: "REFLECTIVE" },
+  { id: 28, text: "喜欢的人突然几小时没回消息，但之前相处一直正常。你的第一反应更接近：", optionA: "她大概只是有事，等她有空再说", optionB: "会想是不是自己哪里让她不舒服了", _dim: "SR", _scoreA: "STABLE", _scoreB: "REFLECTIVE" },
+  { id: 29, text: "文化祭表演前，你被安排到一个比较重要的位置。你更可能：", optionA: "相信已有准备，正式上场前时把注意力放在稳定发挥上", optionB: "临场前再整理一遍细节，让自己对每一步更有把握", _dim: "SR", _scoreA: "STABLE", _scoreB: "REFLECTIVE" },
+  { id: 30, text: "关系逐渐变近，但还没有正式说破。你更舒服的状态是：", optionA: "保持稳定相处，让关系顺着日常慢慢发展", optionB: "细细感受彼此的变化，在合适的时候调整距离感", _dim: "SR", _scoreA: "STABLE", _scoreB: "REFLECTIVE" },
+] as const satisfies ReadonlyArray<IdentityQuestion>;
+
+export const extendedQuestions: Question[] = [...questions, ...identityQuestions as unknown as Question[]];
+
+export function getQuestionsByMode(mode: QuizMode): Question[] {
+  return mode === "extended" ? extendedQuestions : questions;
+}
+
 /**
  * 根据答案计算 MBTI 类型
  * 按题目定义计分：每题的 A/B 选项对应指定维度字母 +1
  * 平分时使用指定题目作为决胜题：EI 看 Q4、SN 看 Q12、TF 看 Q18、JP 看 Q21
  */
-export function calculateMbti(answers: Answer[]): MbtiResult {
-  const s = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+export function calculateMbti(answers: Answer[], mode: QuizMode = "popular"): MbtiResult {
+  const activeQuestions = getQuestionsByMode(mode);
+  const s = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0, stable: 0, reflective: 0 };
 
   for (const ans of answers) {
-    const q = questions.find(q => q.id === ans.questionId);
+    const q = activeQuestions.find(q => q.id === ans.questionId);
     if (!q) continue;
+    if (q._dim === "SR") {
+      if (ans.choice === "A") s.stable++;
+      if (ans.choice === "B") s.reflective++;
+      continue;
+    }
     const letter = ans.choice === "A" ? q._scoreA : q._scoreB;
-    s[letter]++;
+    s[letter as keyof typeof s]++;
   }
 
   const eiT = s.E + s.I || 1;
   const snT = s.S + s.N || 1;
   const tfT = s.T + s.F || 1;
   const jpT = s.J + s.P || 1;
+
+  const srT = s.stable + s.reflective || 1;
 
   const ratios = {
     E: Math.round((s.E / eiT) * 100),
@@ -286,6 +325,8 @@ export function calculateMbti(answers: Answer[]): MbtiResult {
     F: Math.round((s.F / tfT) * 100),
     J: Math.round((s.J / jpT) * 100),
     P: Math.round((s.P / jpT) * 100),
+    stable: Math.round((s.stable / srT) * 100),
+    reflective: Math.round((s.reflective / srT) * 100),
   };
 
   const balanced = {
@@ -293,12 +334,13 @@ export function calculateMbti(answers: Answer[]): MbtiResult {
     SN: s.S === s.N,
     TF: s.T === s.F,
     JP: s.J === s.P,
+    SR: mode === "extended" ? s.stable === s.reflective : false,
   };
 
   // 平分时使用决胜题：EI 看 Q4、SN 看 Q12、TF 看 Q18、JP 看 Q21
   const getTieBreakLetter = (questionId: number, fallback: "E" | "I" | "S" | "N" | "T" | "F" | "J" | "P") => {
     const tieBreakAnswer = answers.find((ans) => ans.questionId === questionId);
-    const tieBreakQuestion = questions.find((q) => q.id === questionId);
+    const tieBreakQuestion = activeQuestions.find((q) => q.id === questionId);
     if (!tieBreakAnswer || !tieBreakQuestion) return fallback;
     return tieBreakAnswer.choice === "A" ? tieBreakQuestion._scoreA : tieBreakQuestion._scoreB;
   };
@@ -310,5 +352,5 @@ export function calculateMbti(answers: Answer[]): MbtiResult {
     s.J > s.P ? "J" : s.J < s.P ? "P" : getTieBreakLetter(21, "P"),
   ].join("");
 
-  return { mbti, scores: s, ratios, balanced };
+  return { mbti, mode, scores: s, ratios, balanced };
 }

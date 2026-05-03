@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
-import { getMatchedCharacter, getMatchDescription } from "@/lib/characters";
+import { getMatchedCharacter, getMatchDescription, type IdentityType } from "@/lib/characters";
 import { RotateCcw, ChevronLeft } from "lucide-react";
 
 const YUZU_LOGO = `${import.meta.env.BASE_URL}cialloti-logo.jpg`;
@@ -81,9 +81,15 @@ function DimBar({ leftLabel, rightLabel, leftPct, leftWins, tied, color, delay =
 export default function Preview() {
   const [, navigate] = useLocation();
   const [selected, setSelected] = useState<string | null>(null);
+  const [mode, setMode] = useState<"popular" | "extended">("popular");
+  const [identity, setIdentity] = useState<IdentityType>("S");
 
-  const char = selected ? getMatchedCharacter(selected) : null;
-  const matchDesc = selected ? getMatchDescription(selected) : "";
+  const char = selected ? getMatchedCharacter(selected, mode, identity) : null;
+  const matchDesc = selected
+    ? mode === "extended"
+      ? char?.description || ""
+      : getMatchDescription(selected)
+    : "";
   const ratios = selected ? MOCK_RATIOS[selected] : null;
   const balanced = selected
     ? {
@@ -125,12 +131,42 @@ export default function Preview() {
             选择 MBTI 预览结果
           </h1>
           <p className="text-sm text-gray-400 mt-2">点击任意类型查看对应匹配角色</p>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <button
+              onClick={() => setMode("popular")}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold border transition ${mode === "popular" ? "bg-orange-500 text-white border-orange-500" : "bg-white text-gray-500 border-gray-200"}`}
+            >
+              经典版
+            </button>
+            <button
+              onClick={() => setMode("extended")}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold border transition ${mode === "extended" ? "bg-orange-500 text-white border-orange-500" : "bg-white text-gray-500 border-gray-200"}`}
+            >
+              扩展版（含新角色）
+            </button>
+            {mode === "extended" && (
+              <div className="ml-2 flex gap-1">
+                <button
+                  onClick={() => setIdentity("S")}
+                  className={`px-2.5 py-1 rounded-full text-xs font-bold border transition ${identity === "S" ? "bg-gray-800 text-white border-gray-800" : "bg-white text-gray-500 border-gray-200"}`}
+                >
+                  S
+                </button>
+                <button
+                  onClick={() => setIdentity("R")}
+                  className={`px-2.5 py-1 rounded-full text-xs font-bold border transition ${identity === "R" ? "bg-gray-800 text-white border-gray-800" : "bg-white text-gray-500 border-gray-200"}`}
+                >
+                  R
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* MBTI 选择网格 */}
         <div className="grid grid-cols-4 gap-2 mb-8">
           {ALL_MBTI.map((mbti) => {
-            const c = getMatchedCharacter(mbti);
+            const c = getMatchedCharacter(mbti, mode, identity);
             const isSelected = selected === mbti;
             return (
               <button

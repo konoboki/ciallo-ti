@@ -7,6 +7,7 @@ const CORS = {
 
 const MBTI_RE = /^[EI][SN][TF][JP]$/;
 const CHARACTER_ID_RE = /^[a-z0-9-]+$/;
+const MAX_QUESTION_ID = 30;
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: CORS });
@@ -16,8 +17,43 @@ export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS });
 }
 
+async function initTables(db) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS quiz_result_stats (
+      mbti TEXT NOT NULL,
+      character_id TEXT NOT NULL,
+      total_count INTEGER NOT NULL DEFAULT 0,
+      updated_at INTEGER NOT NULL DEFAULT (unixepoch()),
+      PRIMARY KEY (mbti, character_id)
+    )
+  `).run();
+
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS quiz_option_stats (
+      question_id INTEGER NOT NULL,
+      choice TEXT NOT NULL CHECK(choice IN ('A', 'B')),
+      total_count INTEGER NOT NULL DEFAULT 0,
+      updated_at INTEGER NOT NULL DEFAULT (unixepoch()),
+      PRIMARY KEY (question_id, choice)
+    )
+  `).run();
+
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS quiz_option_result_stats (
+      question_id INTEGER NOT NULL,
+      choice TEXT NOT NULL CHECK(choice IN ('A', 'B')),
+      mbti TEXT NOT NULL,
+      character_id TEXT NOT NULL,
+      total_count INTEGER NOT NULL DEFAULT 0,
+      updated_at INTEGER NOT NULL DEFAULT (unixepoch()),
+      PRIMARY KEY (question_id, choice, mbti, character_id)
+    )
+  `).run();
+}
+
 export async function onRequestPost({ request, env }) {
   try {
+    await initTables(env.DB);
     const body = await request.json();
     const mbti = typeof body?.mbti === "string" ? body.mbti.trim() : "";
     const characterId = typeof body?.character_id === "string" ? body.character_id.trim() : "";
@@ -31,7 +67,7 @@ export async function onRequestPost({ request, env }) {
       return json({ error: "Invalid character_id" }, 400);
     }
 
-    if (!Array.isArray(answers) || answers.length > 24) {
+    if (!Array.isArray(answers) || answers.length > MAX_QUESTION_ID) {
       return json({ error: "Invalid answers" }, 400);
     }
 
@@ -41,7 +77,7 @@ export async function onRequestPost({ request, env }) {
       const questionId = item?.questionId;
       const choice = item?.choice;
 
-      if (!Number.isInteger(questionId) || questionId < 1 || questionId > 24) {
+      if (!Number.isInteger(questionId) || questionId < 1 || questionId > MAX_QUESTION_ID) {
         return json({ error: "Invalid questionId" }, 400);
       }
 

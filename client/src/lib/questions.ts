@@ -4,9 +4,10 @@
  * 维度信息仅用于计分，不在 UI 中展示
  */
 
-export type DimPair = "EI" | "SN" | "TF" | "JP";
+export type QuizMode = "popular" | "extended";
+export type DimPair = "EI" | "SN" | "TF" | "JP" | "SR";
 export type Choice = "A" | "B";
-export type DimLetter = "E" | "I" | "S" | "N" | "T" | "F" | "J" | "P";
+export type DimLetter = "E" | "I" | "S" | "N" | "T" | "F" | "J" | "P" | "R";
 
 export interface Question {
   id: number;
@@ -26,12 +27,13 @@ export interface Answer {
 
 export interface MbtiResult {
   mbti: string;
-  scores: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number };
-  ratios: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number };
-  balanced: { EI: boolean; SN: boolean; TF: boolean; JP: boolean };
+  scores: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number; R: number };
+  ratios: { E: number; I: number; S: number; N: number; T: number; F: number; J: number; P: number; R: number };
+  balanced: { EI: boolean; SN: boolean; TF: boolean; JP: boolean; SR: boolean };
+  sr?: "S" | "R";
 }
 
-export const questions: Question[] = [
+export const popularQuestions: Question[] = [
   // ── E / I ──
   {
     id: 1,
@@ -257,16 +259,28 @@ export const questions: Question[] = [
   },
 ];
 
-/**
- * 根据答案计算 MBTI 类型
- * 按题目定义计分：每题的 A/B 选项对应指定维度字母 +1
- * 平分时使用指定题目作为决胜题：EI 看 Q4、SN 看 Q12、TF 看 Q18、JP 看 Q21
- */
-export function calculateMbti(answers: Answer[]): MbtiResult {
-  const s = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+
+
+export const extendedQuestions: Question[] = [
+  ...popularQuestions,
+  { id: 25, text: "面对一段关系，你更在意：", optionA: "稳定可预期、细水长流", optionB: "新鲜刺激、心跳加速", _dim: "SR", _scoreA: "S", _scoreB: "R" },
+  { id: 26, text: "约会计划更偏向：", optionA: "熟悉路线与稳妥安排", optionB: "尝试没去过的新地点", _dim: "SR", _scoreA: "S", _scoreB: "R" },
+  { id: 27, text: "遇到感情分歧时你更可能：", optionA: "先把现实问题落地解决", optionB: "先追求情绪和氛围的突破", _dim: "SR", _scoreA: "S", _scoreB: "R" },
+  { id: 28, text: "你理想中的相处节奏是：", optionA: "规律、安心、可持续", optionB: "多变、惊喜、充满火花", _dim: "SR", _scoreA: "S", _scoreB: "R" },
+  { id: 29, text: "选礼物时你更倾向：", optionA: "实用耐用、长期有价值", optionB: "有趣特别、当下很惊艳", _dim: "SR", _scoreA: "S", _scoreB: "R" },
+  { id: 30, text: "关于恋爱观你更认同：", optionA: "陪伴与稳定是第一位", optionB: "热烈与冲动也很重要", _dim: "SR", _scoreA: "S", _scoreB: "R" },
+];
+
+export function getQuestionsByMode(mode: QuizMode): Question[] {
+  return mode === "extended" ? extendedQuestions : popularQuestions;
+}
+
+export function calculateMbti(answers: Answer[], mode: QuizMode = "popular"): MbtiResult {
+  const questionBank = getQuestionsByMode(mode);
+  const s = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0, R: 0 };
 
   for (const ans of answers) {
-    const q = questions.find(q => q.id === ans.questionId);
+    const q = questionBank.find(q => q.id === ans.questionId);
     if (!q) continue;
     const letter = ans.choice === "A" ? q._scoreA : q._scoreB;
     s[letter]++;
@@ -276,39 +290,20 @@ export function calculateMbti(answers: Answer[]): MbtiResult {
   const snT = s.S + s.N || 1;
   const tfT = s.T + s.F || 1;
   const jpT = s.J + s.P || 1;
+  const srT = s.S + s.R || 1;
 
-  const ratios = {
-    E: Math.round((s.E / eiT) * 100),
-    I: Math.round((s.I / eiT) * 100),
-    S: Math.round((s.S / snT) * 100),
-    N: Math.round((s.N / snT) * 100),
-    T: Math.round((s.T / tfT) * 100),
-    F: Math.round((s.F / tfT) * 100),
-    J: Math.round((s.J / jpT) * 100),
-    P: Math.round((s.P / jpT) * 100),
-  };
+  const ratios = { E: Math.round((s.E / eiT) * 100), I: Math.round((s.I / eiT) * 100), S: Math.round((s.S / snT) * 100), N: Math.round((s.N / snT) * 100), T: Math.round((s.T / tfT) * 100), F: Math.round((s.F / tfT) * 100), J: Math.round((s.J / jpT) * 100), P: Math.round((s.P / jpT) * 100), R: Math.round((s.R / srT) * 100) };
+  const balanced = { EI: s.E === s.I, SN: s.S === s.N, TF: s.T === s.F, JP: s.J === s.P, SR: s.S === s.R };
 
-  const balanced = {
-    EI: s.E === s.I,
-    SN: s.S === s.N,
-    TF: s.T === s.F,
-    JP: s.J === s.P,
-  };
-
-  // 平分时使用决胜题：EI 看 Q4、SN 看 Q12、TF 看 Q18、JP 看 Q21
   const getTieBreakLetter = (questionId: number, fallback: "E" | "I" | "S" | "N" | "T" | "F" | "J" | "P") => {
     const tieBreakAnswer = answers.find((ans) => ans.questionId === questionId);
-    const tieBreakQuestion = questions.find((q) => q.id === questionId);
+    const tieBreakQuestion = questionBank.find((q) => q.id === questionId);
     if (!tieBreakAnswer || !tieBreakQuestion) return fallback;
     return tieBreakAnswer.choice === "A" ? tieBreakQuestion._scoreA : tieBreakQuestion._scoreB;
   };
 
-  const mbti = [
-    s.E > s.I ? "E" : s.E < s.I ? "I" : getTieBreakLetter(4, "I"),
-    s.S > s.N ? "S" : s.S < s.N ? "N" : getTieBreakLetter(12, "N"),
-    s.T > s.F ? "T" : s.T < s.F ? "F" : getTieBreakLetter(18, "F"),
-    s.J > s.P ? "J" : s.J < s.P ? "P" : getTieBreakLetter(21, "P"),
-  ].join("");
+  const mbti = [s.E > s.I ? "E" : s.E < s.I ? "I" : getTieBreakLetter(4, "I"), s.S > s.N ? "S" : s.S < s.N ? "N" : getTieBreakLetter(12, "N"), s.T > s.F ? "T" : s.T < s.F ? "F" : getTieBreakLetter(18, "F"), s.J > s.P ? "J" : s.J < s.P ? "P" : getTieBreakLetter(21, "P")].join("");
 
-  return { mbti, scores: s, ratios, balanced };
+  const sr = mode === "extended" ? (s.S >= s.R ? "S" : "R") : undefined;
+  return { mbti, scores: s, ratios, balanced, sr };
 }

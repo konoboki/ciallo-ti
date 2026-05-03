@@ -29,16 +29,16 @@ export default function Home() {
           </div>
           <nav className="flex items-center gap-2">
             <button
-              onClick={() => navigate("/characters")}
+              onClick={() => navigate("/quiz/extended")}
               className="px-4 py-2 text-sm font-medium text-foreground/60 hover:text-foreground transition-colors rounded-lg hover:bg-muted"
             >
-              角色图鉴
+              扩展角色测试
             </button>
             <button
-              onClick={() => navigate("/quiz")}
+              onClick={() => navigate("/quiz/popular")}
               className="yuzu-btn text-sm !py-2 !px-5"
             >
-              开始测试
+              热门角色测试
             </button>
           </nav>
         </div>
@@ -78,10 +78,10 @@ export default function Home() {
                 <div className="flex flex-col items-center gap-6">
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
-                      onClick={() => navigate("/quiz")}
+                      onClick={() => navigate("/quiz/popular")}
                       className="yuzu-btn text-base flex items-center justify-center gap-2 !px-8 !py-3.5"
                     >
-                      开始测试
+                      热门角色测试
                       <ArrowRight size={18} />
                     </button>
                     <button
@@ -89,7 +89,7 @@ export default function Home() {
                       className="px-8 py-3.5 rounded-xl text-base font-semibold border border-border text-foreground/60 hover:text-foreground hover:border-foreground/20 hover:bg-muted transition-all flex items-center justify-center gap-2"
                     >
                       <BookOpen size={18} />
-                      角色图鉴
+                      扩展角色测试
                     </button>
                   </div>
 

@@ -178,7 +178,7 @@ export const characters: Character[] = [
 ];
 
 /**
- * 用户MBTI → 最适合结婚的角色
+ * 用户MBTI → 最适合结婚的角色（扩展模式）
  */
 export const mbtiToCharacter: Record<string, string> = {
   INFP:  "kanna",
@@ -197,6 +197,25 @@ export const mbtiToCharacter: Record<string, string> = {
   ESFP:  "yoshino",
   ISTP:  "sumi",
   ESTP:  "mako",
+};
+
+export const popularMbtiToCharacterId: Record<string, string> = {
+  INFP: "kanna",
+  ENFP: "natsume",
+  INFJ: "amane",
+  ENFJ: "harumi-ena",
+  INTP: "murasame",
+  ENTP: "nene",
+  INTJ: "meguru",
+  ENTJ: "ayase",
+  ISFJ: "kanade",
+  ESFJ: "nanami",
+  ISTJ: "tsumugi",
+  ESTJ: "suzuno",
+  ISFP: "rikka",
+  ESFP: "yoshino",
+  ISTP: "sumi",
+  ESTP: "mako",
 };
 
 /**
@@ -221,8 +240,9 @@ export const mbtiMatchDescription: Record<string, string> = {
   ESTP: '你可能会被常陆茉子这种冷静、稳得住、关键时刻很可靠的人吸引。她不像表面看起来那么单薄，而是很能扛事、很有责任感，这种"你往前冲、她能接得住"的感觉，对 ESTP 特别有魅力。',
 };
 
-export function getMatchedCharacter(mbti: string): Character {
-  const charId = mbtiToCharacter[mbti];
+export function getMatchedCharacter(mbti: string, mode: "popular" | "extended" = "popular"): Character {
+  const table = mode === "extended" ? mbtiToCharacter : popularMbtiToCharacterId;
+  const charId = table[mbti];
   const char = characters.find(c => c.id === charId);
   return char ?? characters[0];
 }

@@ -198,7 +198,8 @@ export default function Result() {
     }
   }, [navigate]);
 
-  const char = result ? getMatchedCharacter(result.mbti) : null;
+  const mode = (sessionStorage.getItem("quizMode") === "extended" ? "extended" : "popular") as "popular" | "extended";
+  const char = result ? getMatchedCharacter(result.mbti, mode) : null;
 
   // 加载统计数据和概率缓存
   useEffect(() => {

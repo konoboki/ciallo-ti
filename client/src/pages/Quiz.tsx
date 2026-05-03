@@ -4,14 +4,17 @@
  */
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLocation } from "wouter";
-import { questions, calculateMbti, type Answer, type Choice } from "@/lib/questions";
+import { useLocation, useRoute } from "wouter";
+import { getQuestionsByMode, calculateMbti, type Answer, type Choice, type QuizMode } from "@/lib/questions";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const YUZU_LOGO = `${import.meta.env.BASE_URL}cialloti-logo.jpg`;
 
 export default function Quiz() {
   const [, navigate] = useLocation();
+  const [matched, params] = useRoute<{ mode?: string }>("/quiz/:mode");
+  const mode: QuizMode = matched && params?.mode === "extended" ? "extended" : "popular";
+  const questions = getQuestionsByMode(mode);
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, Choice>>({});
   const [dir, setDir] = useState<1 | -1>(1);
@@ -74,7 +77,7 @@ export default function Quiz() {
       questionId: Number(id),
       choice: choice as Choice,
     }));
-    const result = calculateMbti(answerList);
+    const result = calculateMbti(answerList, mode);
     sessionStorage.setItem("mbtiResult", JSON.stringify(result));
     sessionStorage.setItem("mbtiAnswers", JSON.stringify(answerList));
     navigate("/result");

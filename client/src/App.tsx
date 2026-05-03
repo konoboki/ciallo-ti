@@ -20,6 +20,7 @@ function App() {
           <Router hook={useHashLocation}>
             <Switch>
               <Route path="/" component={Home} />
+              <Route path="/quiz/:mode" component={Quiz} />
               <Route path="/quiz" component={Quiz} />
               <Route path="/characters" component={Characters} />
               <Route path="/result" component={Result} />

@@ -179,7 +179,7 @@ export const characters: Character[] = [
     id: "harumi-ena",
     name: "阳见惠凪",
     nameJa: "陽見 恵凪",
-    game: "limelight lemonade jam",
+    game: "limelight lemonade Jam",
     mbti: "花Q",
     characterMbti: "INFP",
     identity: "R",

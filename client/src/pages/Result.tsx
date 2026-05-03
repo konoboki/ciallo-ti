@@ -296,7 +296,7 @@ export default function Result() {
 
   if (!result || !char) return null;
 
-  const matchDesc = getMatchDescription(result.mbti);
+  const matchDesc = result.mode === "extended" ? char.description : getMatchDescription(result.mbti);
   const { ratios, balanced } = result;
 
   const tiedDims = [

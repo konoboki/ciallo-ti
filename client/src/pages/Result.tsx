@@ -6,7 +6,12 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
-import { getMatchedCharacter, getMatchDescription } from "@/lib/characters";
+import {
+  characters,
+  getMatchedCharacter,
+  getMatchDescription,
+} from "@/lib/characters";
+import type { Character } from "@/lib/characters";
 import type { MbtiResult, Answer } from "@/lib/questions";
 import { RotateCcw, Share2, Users, Star, Heart } from "lucide-react";
 import { toast } from "sonner";
@@ -173,6 +178,87 @@ function StarRating({
   );
 }
 
+
+
+type AlternativeMode = "similar" | "complement";
+
+const attractionRules: Record<string, string[]> = {
+  ISTJ: ["ESFP", "ENFP", "ISFJ"],
+  ISFJ: ["ESFP", "ENFP", "ISTP"],
+  INFJ: ["ENFP", "ENTP", "INFP"],
+  INTJ: ["ENFP", "ENTP", "INFP"],
+  ISTP: ["ESFJ", "ENFP", "ISFP"],
+  ISFP: ["ENFJ", "ESFP", "INFP"],
+  INFP: ["ENFJ", "ENFP", "INFJ"],
+  INTP: ["ENFJ", "ENFP", "ENTJ"],
+  ESTP: ["ISFJ", "ISTJ", "ESFP"],
+  ESFP: ["ISFJ", "ISTP", "ENFP"],
+  ENFP: ["INFJ", "INTJ", "INFP"],
+  ENTP: ["INFJ", "INTJ", "ENFP"],
+  ESTJ: ["ISFP", "ISTP", "ESFJ"],
+  ESFJ: ["ISTP", "ISFP", "ENFP"],
+  ENFJ: ["INFP", "ISFP", "INFJ"],
+  ENTJ: ["INTP", "INFP", "ENFP"],
+};
+
+function sharedMbtiLetters(a: string, b: string): number {
+  if (!a || !b || a.length < 4 || b.length < 4) return 0;
+  let count = 0;
+  for (let i = 0; i < 4; i++) {
+    if (a[i] === b[i]) count++;
+  }
+  return count;
+}
+
+function scoreComplement(
+  playerMbti: string,
+  playerIdentity: "S" | "R" | undefined,
+  character: Character
+): number {
+  let score = 0;
+  const rules = attractionRules[playerMbti] ?? [];
+  const characterMbti = character.characterMbti ?? "";
+  const index = rules.indexOf(characterMbti);
+  if (index === 0) score += 100;
+  else if (index === 1) score += 80;
+  else if (index === 2) score += 60;
+  score += sharedMbtiLetters(playerMbti, characterMbti) * 5;
+  if (playerIdentity && character.identity) {
+    score += playerIdentity !== character.identity ? 15 : 5;
+  }
+  return score;
+}
+
+function scoreSimilar(
+  playerMbti: string,
+  playerIdentity: "S" | "R" | undefined,
+  character: Character
+): number {
+  let score = 0;
+  const characterMbti = character.characterMbti ?? "";
+  if (characterMbti === playerMbti) score += 100;
+  if (
+    characterMbti.length >= 4 &&
+    playerMbti.length >= 4 &&
+    characterMbti.slice(1) === playerMbti.slice(1)
+  ) {
+    score += 60;
+  }
+  score += sharedMbtiLetters(playerMbti, characterMbti) * 15;
+  if (playerIdentity && character.identity) {
+    score += playerIdentity === character.identity ? 15 : 5;
+  }
+  return score;
+}
+
+function getPublicDescription(description: string): string {
+  return description
+    .replace(/\b([EI][NS][TF][JP])-[SR]\b/g, "$1")
+    .replace(/([EI][NS][TF][JP])-[SR] 型/g, "$1 型")
+    .replace(/STABLE/g, "")
+    .replace(/REFLECTIVE/g, "");
+}
+
 export default function Result() {
   const [, navigate] = useLocation();
   const [result, setResult] = useState<MbtiResult | null>(null);
@@ -187,6 +273,8 @@ export default function Result() {
   const [myRating, setMyRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
   const [matchPercentage, setMatchPercentage] = useState<number | null>(null);
+  const [alternativeCharacter, setAlternativeCharacter] = useState<Character | null>(null);
+  const [alternativeMode, setAlternativeMode] = useState<AlternativeMode | null>(null);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("mbtiResult");
@@ -204,6 +292,7 @@ export default function Result() {
       : (result.scores.reflective > result.scores.stable ? "R" : "S")
     : "S";
   const char = result ? getMatchedCharacter(result.mbti, result.mode ?? "popular", srIdentity) : null;
+  const playerIdentity = result?.mode === "extended" ? srIdentity : undefined;
 
   // 加载统计数据和概率缓存
   useEffect(() => {
@@ -297,6 +386,27 @@ export default function Result() {
   if (!result || !char) return null;
 
   const matchDesc = result.mode === "extended" ? char.description : getMatchDescription(result.mbti);
+
+  function recommendAlternativeCharacter(mode: AlternativeMode) {
+    if (!result || !char) return;
+    const identityForScoring = result.mode === "extended" ? playerIdentity : undefined;
+    const candidates = characters
+      .filter((c) => c.id !== char.id)
+      .map((c) => ({
+        character: c,
+        score:
+          mode === "similar"
+            ? scoreSimilar(result.mbti, identityForScoring, c)
+            : scoreComplement(result.mbti, identityForScoring, c),
+      }))
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score);
+    if (candidates.length === 0) return;
+    const top = candidates.slice(0, 3);
+    const picked = top[Math.floor(Math.random() * top.length)].character;
+    setAlternativeCharacter(picked);
+    setAlternativeMode(mode);
+  }
   const { ratios, balanced } = result;
 
   const tiedDims = [
@@ -454,7 +564,7 @@ export default function Result() {
             style={{ background: "linear-gradient(135deg, #FFF8F0, #FFF3E8)", border: "1px solid #FFE0C5" }}
           >
             <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "#FF8C42" }}>为什么是 Ta？</p>
-            <p className="text-sm leading-relaxed text-gray-600" style={{ fontFamily: "'Noto Serif SC', serif" }}>{matchDesc}</p>
+            <p className="text-sm leading-relaxed text-gray-600" style={{ fontFamily: "'Noto Serif SC', serif" }}>{getPublicDescription(matchDesc)}</p>
           </motion.div>
         )}
 
@@ -529,6 +639,78 @@ export default function Result() {
             color="#C85BFF"
             delay={0.85}
           />
+        </motion.div>
+
+
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.65 }}
+          className="mt-6 rounded-2xl border border-orange-100 bg-orange-50/50 px-5 py-5"
+        >
+          <p
+            className="text-xs font-bold tracking-widest uppercase mb-3"
+            style={{ color: "#FF8C42" }}
+          >
+            另一个推荐角色
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => recommendAlternativeCharacter("similar")}
+              className="flex-1 py-3 rounded-xl bg-white border border-orange-100 text-sm font-bold text-gray-600 hover:bg-orange-50 transition-all"
+            >
+              和我更像
+            </button>
+            <button
+              onClick={() => recommendAlternativeCharacter("complement")}
+              className="flex-1 py-3 rounded-xl text-sm font-bold text-white transition-all"
+              style={{ background: "linear-gradient(135deg, #FF8C42, #FF6B1A)" }}
+            >
+              和我互补
+            </button>
+          </div>
+          {alternativeCharacter && (
+            <motion.div
+              key={`${alternativeMode}-${alternativeCharacter.id}`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="mt-4 rounded-2xl bg-white border border-orange-100 overflow-hidden"
+            >
+              <div
+                className="flex items-center gap-4 p-4"
+                style={{
+                  background: `linear-gradient(135deg, ${alternativeCharacter.color}33, #fff)`,
+                }}
+              >
+                {alternativeCharacter.image && (
+                  <img
+                    src={alternativeCharacter.image}
+                    alt={alternativeCharacter.name}
+                    className="w-20 h-20 object-contain rounded-xl bg-white/70"
+                  />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-orange-400 font-bold mb-1">
+                    {alternativeMode === "similar" ? "和你更像的角色" : "和你互补的角色"}
+                  </p>
+                  <h4
+                    className="text-xl font-black text-gray-800"
+                    style={{ fontFamily: "'Noto Serif SC', serif" }}
+                  >
+                    {alternativeCharacter.name}
+                  </h4>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {alternativeCharacter.game}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                    {getPublicDescription(alternativeCharacter.description ?? "")}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* 操作按钮 */}

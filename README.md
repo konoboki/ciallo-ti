@@ -166,24 +166,72 @@ S/R 不会改变页面展示的 4 字母 MBTI，只用于扩展模式下的角�
 
 ## MBTI 与角色匹配表
 
+本项目目前有两套匹配表：
+
+- **Popular / 热门角色测试**：只根据 4 字母 MBTI 匹配 16 个角色。
+- **Extended / 扩展角色测试**：根据 `MBTI-S/R` 匹配 32 个角色，其中 S/R 为内部指标，不作为正式 MBTI 展示。
+
+---
+
+### Popular 热门角色测试匹配表（16 角色）
+
 | 你的 MBTI | 匹配角色 | 角色 MBTI | 所属作品 |
 |-----------|---------|-----------|---------|
 | INFP | 明月栞那 | ENFJ | 星光咖啡馆与死神之蝶 |
-| INTP | 丛雨 | INTJ | 千恋＊万花 |
 | ENFP | 四季夏目 | INTJ | 星光咖啡馆与死神之蝶 |
-| INTJ | 因幡巡 | ENFP | 魔女的夜宴 |
-| ENTP | 绫地宁宁 | INFJ | 魔女的夜宴 |
 | INFJ | 谷风天音 | ENTP | 天使☆嚣嚣 RE-BOOT! |
-| ENFJ | 阳见惠凪 | INFP | LLLJ |
+| ENFJ | 阳见惠凪 | INFP | LimeLight Lemonade Jam |
+| INTP | 丛雨 | INFJ | 千恋＊万花 |
+| ENTP | 绫地宁宁 | INFJ | 魔女的夜宴 |
+| INTJ | 因幡巡 | ENFP | 魔女的夜宴 |
 | ENTJ | 三司绫濑 | INFP | RIDDLE JOKER |
-| ISFJ | 仮屋和奏 | ESFP | 魔女的夜宴 |
-| ISTJ | 布良梓   | ISFJ | DRACU-RIOT! |
+| ISFJ | 假屋和奏 | ESFP | 魔女的夜宴 |
 | ESFJ | 在原七海 | ISFJ | RIDDLE JOKER |
+| ISTJ | 椎叶䌷 | ISFJ | 魔女的夜宴 |
 | ESTJ | 汐山凉音 | ISTJ | 星光咖啡馆与死神之蝶 |
 | ISFP | 马庭芦花 | ESFJ | 千恋＊万花 |
 | ESFP | 朝武芳乃 | ISFJ | 千恋＊万花 |
 | ISTP | 墨染希 | ESFJ | 星光咖啡馆与死神之蝶 |
 | ESTP | 常陆茉子 | ISFJ | 千恋＊万花 |
+
+---
+
+### Extended 扩展角色测试匹配表（32 角色）
+
+| 你的类型 | 匹配角色 | 角色 MBTI | S/R | 所属作品 |
+|----------|---------|-----------|-----|---------|
+| ISTJ-S | 椎叶䌷 | ISFJ | R | 魔女的夜宴 |
+| ISTJ-R | 二见原莉莉子 | ESFP | S | LimeLight Lemonade Jam |
+| ISFJ-S | 隐杏珠 | ENFP | R | LimeLight Lemonade Jam |
+| ISFJ-R | 假屋和奏 | ESFP | S | 魔女的夜宴 |
+| INFJ-S | 艾莉娜·欧列格夫娜·欧文 | ENFP | R | DRACU-RIOT! |
+| INFJ-R | 谷风天音 | ENTP | S | 天使☆嚣嚣 RE-BOOT! |
+| INTJ-S | 白雪乃爱 | ENFP | R | 天使☆嚣嚣 RE-BOOT! |
+| INTJ-R | 因幡巡 | ENFP | S | 魔女的夜宴 |
+| ISTP-S | 天雾夕音 | ESFJ | R | 天色＊アイルノーツ |
+| ISTP-R | 墨染希 | ESFJ | S | 星光咖啡馆与死神之蝶 |
+| ISFP-S | 上坂茅羽耶 | INFP | R | 夏空彼方 |
+| ISFP-R | 马庭芦花 | ESFJ | S | 千恋＊万花 |
+| INFP-S | 布良梓 | ISFJ | R | DRACU-RIOT! |
+| INFP-R | 明月栞那 | ENFJ | S | 星光咖啡馆与死神之蝶 |
+| INTP-S | 丛雨 | INFJ | R | 千恋＊万花 |
+| INTP-R | 矢来美羽 | ESFJ | S | DRACU-RIOT! |
+| ESTP-S | 常陆茉子 | ISFJ | R | 千恋＊万花 |
+| ESTP-R | 二条院羽月 | ISFJ | S | RIDDLE JOKER |
+| ESFP-S | 朝武芳乃 | ISFJ | R | 千恋＊万花 |
+| ESFP-R | 千岁佐奈 | ISFJ | R | 天神乱漫 |
+| ENFP-S | 四季夏目 | INTJ | R | 星光咖啡馆与死神之蝶 |
+| ENFP-R | 户隐憧子 | INFJ | R | 魔女的夜宴 |
+| ENTP-S | 绫地宁宁 | INFJ | R | 魔女的夜宴 |
+| ENTP-R | 小云雀来海 | ENTP | S | 天使☆嚣嚣 RE-BOOT! |
+| ESTJ-S | 岛越月望 | ESFJ | S | LimeLight Lemonade Jam |
+| ESTJ-R | 汐山凉音 | ISTJ | S | 星光咖啡馆与死神之蝶 |
+| ESFJ-S | 蕾娜 | ENFP | S | 千恋＊万花 |
+| ESFJ-R | 在原七海 | ISFJ | S | RIDDLE JOKER |
+| ENFJ-S | 阳见惠凪 | INFP | R | LimeLight Lemonade Jam |
+| ENFJ-R | 鞍马小春 | ESFJ | S | 千恋＊万花 |
+| ENTJ-S | 三司绫濑 | INFP | R | RIDDLE JOKER |
+| ENTJ-R | 式部茉优 | ENTP | S | RIDDLE JOKER |
 
 ---
 
